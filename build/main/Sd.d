@@ -1,6 +1,7 @@
 Sd.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.c \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h \
+ /home/danilo/esp/esp-idf/components/vfs/include/sys/dirent.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
@@ -45,16 +46,34 @@ Sd.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.c \
  /home/danilo/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h \
  /home/danilo/esp/esp-idf/components/esp32/include/rom/spi_flash.h \
  /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/spi_flash.h \
+ /home/danilo/esp/esp-idf/components/fatfs/src/ff.h \
+ /home/danilo/esp/esp-idf/components/fatfs/src/ffconf.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/can.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h \
+ /home/danilo/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
+ /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
+ /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/gpio.h \
+ /home/danilo/esp/esp-idf/components/soc/include/soc/gpio_periph.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_pins.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/io_mux_reg.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/State.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gsm.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h \
- /home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h \
- /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Ble.h
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Ble.h \
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h
 
 /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h:
+
+/home/danilo/esp/esp-idf/components/vfs/include/sys/dirent.h:
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
@@ -144,7 +163,39 @@ Sd.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.c \
 
 /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/spi_flash.h:
 
+/home/danilo/esp/esp-idf/components/fatfs/src/ff.h:
+
+/home/danilo/esp/esp-idf/components/fatfs/src/ffconf.h:
+
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/can.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h:
+
+/home/danilo/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
+
+/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
+
+/home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/gpio.h:
+
+/home/danilo/esp/esp-idf/components/soc/include/soc/gpio_periph.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_pins.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/io_mux_reg.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/State.h:
 
@@ -152,7 +203,7 @@ Sd.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.c \
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h:
 
-/home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h:
-
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Ble.h:
+
+/home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h:
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/./Sd.c:

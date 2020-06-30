@@ -81,9 +81,27 @@ main.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/main.c \
  /home/danilo/esp/esp-idf/components/esp_wifi/include/esp_wifi_crypto_types.h \
  /home/danilo/esp/esp-idf/components/esp_wifi/include/esp_private/wifi_os_adapter.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h \
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_server.h \
+ /home/danilo/esp/esp-idf/components/esp_http_server/include/esp_http_server.h \
+ /home/danilo/esp/esp-idf/components/nghttp/port/include/http_parser.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/can.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h \
+ /home/danilo/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
+ /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
+ /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/gpio.h \
+ /home/danilo/esp/esp-idf/components/soc/include/soc/gpio_periph.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_pins.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/io_mux_reg.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartGps.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartGsm.h \
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartConfig.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Io.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gps.h \
@@ -255,11 +273,47 @@ main.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/main.c \
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_client.h:
 
+/home/danilo/esp/esp-idf/examples/get-started/cuv/main/http_server.h:
+
+/home/danilo/esp/esp-idf/components/esp_http_server/include/esp_http_server.h:
+
+/home/danilo/esp/esp-idf/components/nghttp/port/include/http_parser.h:
+
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/can.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h:
+
+/home/danilo/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
+
+/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
+
+/home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/gpio.h:
+
+/home/danilo/esp/esp-idf/components/soc/include/soc/gpio_periph.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_pins.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/io_mux_reg.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartGps.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartGsm.h:
+
+/home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartConfig.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.h:
 

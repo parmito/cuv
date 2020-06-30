@@ -28,10 +28,12 @@
 #include "freertos/semphr.h"
 #include "app_wifi.h"
 #include "http_client.h"
+#include "http_server.h"
 
 #include "defines.h"
 #include "UartGps.h"
 #include "UartGsm.h"
+#include "UartConfig.h"
 #include "Debug.h"
 #include "Io.h"
 #include "Gps.h"
@@ -139,6 +141,14 @@ void app_main()
     printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
+    /* Uart Gsm initialization*/
+    UartGsminit();
+
+    /* Uart Gps initialization*/
+    UartGpsinit();
+
+    /* Uart Config initialization*/
+    UartConfiginit();
 
 	xQueueSd = xQueueCreate(sdQUEUE_LENGTH,			/* The number of items the queue can hold. */
 							sizeof( sMessageType ) );	/* The size of each item the queue holds. */
@@ -147,20 +157,20 @@ void app_main()
 	xQueueGsm = xQueueCreate(gsmQUEUE_LENGTH,			/* The number of items the queue can hold. */
 								sizeof( sMessageType ) );	/* The size of each item the queue holds. */
 
-	xQueueBle = xQueueCreate(bleQUEUE_LENGTH, sizeof(sMessageType));
+	xQueueBle = xQueueCreate(10, sizeof(sMessageType));
 
 
 	xQueueHttpCli = xQueueCreate(httcliQUEUE_LENGTH,			/* The number of items the queue can hold. */
 								sizeof( sMessageType ) );	/* The size of each item the queue holds. */
 
-	xQueueDebug = xQueueCreate(debugQUEUE_LENGTH,			/* The number of items the queue can hold. */
+	xQueueHttpSrv = xQueueCreate(httsrvQUEUE_LENGTH,			/* The number of items the queue can hold. */
+								sizeof( sMessageType ) );	/* The size of each item the queue holds. */
+
+	xQueueDebug = xQueueCreate(sdQUEUE_LENGTH,			/* The number of items the queue can hold. */
 							sizeof( sMessageType ) );	/* The size of each item the queue holds. */
 
 	xQueueIo = xQueueCreate(ioQUEUE_LENGTH,			/* The number of items the queue can hold. */
 							sizeof( sMessageType ) );	/* The size of each item the queue holds. */
-
-    /* Io initialization*/
-    Io_Init();
 
     /* Sd initialization*/
     SdInit();
@@ -171,22 +181,20 @@ void app_main()
     /* Debug initialization*/
     DebugInit();
 
-    /*Http Client*/
-    /*Http_Init();*/
+    /* Gps initialization*/
+    GpsInit();
 
-    /* Uart Gsm initialization*/
-    /*UartGsminit();*/
+    /*Http Client*/
+    Http_Init();
+
     /* Gsm initialization*/
-    /*GsmInit();*/
+    GsmInit();
 
     /* RemoteReceiver initialization*/
     /*RemoteReceiverInit();*/
 
-    /* Uart Gps initialization*/
-    /*UartGpsinit();*/
-    /* Gps initialization*/
-    /*GpsInit();*/
-
+    /* Io initialization*/
+    Io_Init();
 
     while(1)
     {

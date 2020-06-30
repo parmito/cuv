@@ -64,6 +64,7 @@ static uint16_t spp_mtu_size = 23;
 static uint16_t spp_conn_id = 0xffff;
 static esp_gatt_if_t spp_gatts_if = 0xff;
 QueueHandle_t spp_uart_queue = NULL;
+
 //////////////////////////////////////////////
 //
 //
@@ -71,6 +72,7 @@ QueueHandle_t spp_uart_queue = NULL;
 //
 //
 //////////////////////////////////////////////
+
 void vTaskBle( void *pvParameters );
 
 //////////////////////////////////////////////
@@ -837,7 +839,7 @@ void vTaskBle( void *pvParameters )
 	for( ;; )
 	{
 		elapsed_time = xTaskGetTickCount();
-	    ESP_LOGI(BLE_TASK_TAG, "Running...");
+	    /*ESP_LOGI(BLE_TASK_TAG, "Running...");*/
 
 	    /* Send data to client*/
 		if(xQueueReceive(xQueueBle, &( stBleMsg ), portMAX_DELAY))

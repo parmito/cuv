@@ -71,6 +71,8 @@ Debug.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.c \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/UartGsm.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/State.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/can.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gsm.h
@@ -218,6 +220,10 @@ Debug.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.c \
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/State.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/can.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h:
 

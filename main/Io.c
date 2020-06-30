@@ -54,13 +54,6 @@
 
 #define NUM_OF(x) (sizeof(x)/sizeof(x[0]))
 
-#define SIZE_OF_STRUCT 20
-//Configure message to transmit
-typedef struct{
-	unsigned long u32Timeout;
-	unsigned long u32Period;
-	can_message_t stCan;
-}tstCanMessage;
 //////////////////////////////////////////////
 //
 //
@@ -979,8 +972,8 @@ unsigned char TaskIo_ReadIo(void)
 
 
 	#if DEBUG_IO
-	ESP_LOGI(IO_TASK_TAG,"AD Voltage=%d\r\n",adc_reading);
-	ESP_LOGI(IO_TASK_TAG,"MainBattery Voltage=%.2f\r\n",stIo.flAdMainBatteryVoltage);
+	/*ESP_LOGI(IO_TASK_TAG,"AD Voltage=%d\r\n",adc_reading);
+	ESP_LOGI(IO_TASK_TAG,"MainBattery Voltage=%.2f\r\n",stIo.flAdMainBatteryVoltage);*/
 	#endif
 
 
@@ -1058,11 +1051,11 @@ unsigned char TaskIo_ReadIo(void)
 #endif
 		#if DEBUG_IO
 		/*ESP_LOGI(IO_TASK_TAG,"  %d: %.1f    %d errors\n", i, readings[i], errors_count[i]);*/
-		ESP_LOGI(IO_TASK_TAG,"Temperature=%.1f C\n", stIo.flI2cTemperature);
+		/*ESP_LOGI(IO_TASK_TAG,"Temperature=%.1f C\n", stIo.flI2cTemperature);*/
 
 
 		memset(cLocalBuffer,0,sizeof(cLocalBuffer));
-		sprintf(cLocalBuffer,"IO:SW,Bat,Temp,Ign=%s,%.1f,%.1f,%d\r\n",SW_VERSION,stIo.flAdMainBatteryVoltage,stIo.flI2cTemperature,stIo.ucIgnition);
+		sprintf(cLocalBuffer,"IO:SW,Bat,Temp,Ign=%s,%.1f,%.1f,%d\r\n",SOFTWARE_VERSION,stIo.flAdMainBatteryVoltage,stIo.flI2cTemperature,stIo.ucIgnition);
 
 		stIoMsg.ucSrc = SRC_IO;
 		stIoMsg.ucDest = SRC_BLE;
@@ -1094,7 +1087,7 @@ unsigned char TaskIo_ReadIo(void)
 			stCanMessage100ms[u8Index].stCan.data[2] = 0x03;
 		}
 		#if DEBUG_IO
-		ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");
+		/*ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");*/
 		#endif
 
 		if(ucCurrIgnition != stIo.ucIgnition)
@@ -1125,17 +1118,17 @@ unsigned char TaskIo_ReadIo(void)
 
 
 		#if DEBUG_IO
-		ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");
+		/*ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");*/
 		#endif
 
 		if(ucCurrIgnition != stIo.ucIgnition)
 		{
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"Status=%d,Index=%d\r\n",u8Status,u8Index);
+			/*ESP_LOGI(IO_TASK_TAG,"Status=%d,Index=%d\r\n",u8Status,u8Index);*/
 			#endif
 
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");
+			/*ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");*/
 			#endif
 			ucCurrIgnition = stIo.ucIgnition;
 		}
@@ -1143,7 +1136,7 @@ unsigned char TaskIo_ReadIo(void)
 		if(u32EnterSleepMode > 0)
 		{
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"Sleep=%d\r\n",(int)u32EnterSleepMode);
+			/*ESP_LOGI(IO_TASK_TAG,"Sleep=%d\r\n",(int)u32EnterSleepMode);*/
 			#endif
 
 			u32EnterSleepMode--;
@@ -1639,21 +1632,21 @@ void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
 	if(stCanMessage[1].stCan.identifier != 0)
 	{
 		#if DEBUG_IO
-		ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
-		ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);
+		/*ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
+		ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);*/
 		#endif
 		if (can_transmit(&stCanMessage[1].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
 		{
 			gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[1].stCan.identifier);
-			ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
+			/*ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[1].stCan.identifier);
+			ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");*/
 			#endif
 
 			#if DEBUG_IO
 			for (unsigned int u16 = 0; u16 < stCanMessage[1].stCan.data_length_code; u16++)
 			{
-				ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[1].stCan.data[u16]);
+				/*ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[1].stCan.data[u16]);*/
 			}
 			#endif
 		}
@@ -1661,7 +1654,7 @@ void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
 		{
 			gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[1].stCan.identifier);
+			/*ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[1].stCan.identifier);*/
 			#endif
 
 			can_clear_transmit_queue();
@@ -1694,21 +1687,21 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 		if(stCanMessage[i].stCan.identifier != 0)
 		{
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
-			ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);
+			/*ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
+			ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);*/
 			#endif
 			if (can_transmit(&stCanMessage[i].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
 				#if DEBUG_IO
-				ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[i].stCan.identifier);
-				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
+				/*ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[i].stCan.identifier);
+				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");*/
 				#endif
 
 				#if DEBUG_IO
 				for (unsigned int u16 = 0; u16 < stCanMessage[i].stCan.data_length_code; u16++)
 				{
-					ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[i].stCan.data[u16]);
+					/*ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[i].stCan.data[u16]);*/
 				}
 				#endif
 			}
@@ -1716,7 +1709,7 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
 				#if DEBUG_IO
-				ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[i].stCan.identifier);
+				/*ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[i].stCan.identifier);*/
 				#endif
 
 				can_clear_transmit_queue();

@@ -79,7 +79,7 @@ static uint32_t ulQtyPulseGps = 1;
 static uint32_t ulPeriodGps = 4;*/
 
 sMessageType stDebugMsg;
-static bool boGpsHasFixed = false;
+/*static bool boGpsHasFixed = false;*/
 static const char *DEBUG_TASK_TAG = "DEBUG_TASK";
 
 //////////////////////////////////////////////
@@ -209,7 +209,7 @@ void DebugInit(void)
 							sizeof( sMessageType ) );	/* The size of each item the queue holds. */
 #endif
 
-    xTaskCreate(vTaskDebug, "vTaskDebug", 1024*2, NULL, configMAX_PRIORITIES-3, NULL);
+    xTaskCreate(vTaskDebug, "vTaskDebug", 1024*2, NULL, configMAX_PRIORITIES-4, NULL);
 	/* Create the queue used by the queue send and queue receive tasks.
 	http://www.freertos.org/a00116.html */
 
@@ -233,10 +233,6 @@ unsigned char TaskDebug_Gsm_Init(sMessageType *psMessage)
     uint32_t u32FreqHz = 1;
 	int ch;
 
-	if(boGpsHasFixed != false)
-	{
-		u32FreqHz = 2;
-	}
 	/*
 	 * Prepare and set configuration of timers
 	 * that will be used by LED Controller
@@ -254,7 +250,7 @@ unsigned char TaskDebug_Gsm_Init(sMessageType *psMessage)
 	ledc_channel_config_t ledc_channel[LEDC_TEST_CH_NUM] = {
 		{
 			.channel    = LEDC_LS_CH2_CHANNEL,
-			.duty       = 0,
+			.duty       = 2000,
 			.gpio_num   = GPIO_OUTPUT_GSM_DIAG,
 			.speed_mode = LEDC_HS_MODE,
 			.hpoint     = 0,
@@ -262,7 +258,7 @@ unsigned char TaskDebug_Gsm_Init(sMessageType *psMessage)
 		},
 		{
 			.channel    = LEDC_LS_CH3_CHANNEL,
-			.duty       = 0,
+			.duty       = 2000,
 			.gpio_num   = GPIO_OUTPUT_GSM_DIAG_EXT,
 			.speed_mode = LEDC_HS_MODE,
 			.hpoint     = 0,
@@ -295,7 +291,6 @@ unsigned char TaskDebug_Gsm_Connecting(sMessageType *psMessage)
 
     ESP_LOGI(DEBUG_TASK_TAG, "TaskDebug_Gsm_Connecting\r\n");
 
-
     return(boError);
 }
 //////////////////////////////////////////////
@@ -323,14 +318,10 @@ unsigned char TaskDebug_Gsm_UploadDone(sMessageType *psMessage)
 {
     unsigned char boError = true;
     int ch;
-    uint32_t u32FreqHz = 8;
+    uint32_t u32FreqHz = 4;
 
     ESP_LOGI(DEBUG_TASK_TAG, "TaskDebug_Gsm_UploadDone\r\n");
 
-	if(boGpsHasFixed != false)
-	{
-		u32FreqHz = 16;
-	}
 	/*
 	 * Prepare and set configuration of timers
 	 * that will be used by LED Controller
@@ -389,8 +380,53 @@ unsigned char TaskDebug_Gps_NotFixed(sMessageType *psMessage)
 {
     unsigned char boError = true;
 
-    boGpsHasFixed = false;
+/*	gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+	gpio_set_level(GPIO_OUTPUT_GSM_DIAG_EXT, 0);*/
+    uint32_t u32FreqHz = 1;
+	int ch;
 
+	/*
+	 * Prepare and set configuration of timers
+	 * that will be used by LED Controller
+	 */
+	ledc_timer_config_t ledc_timer = {
+		.duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
+		.freq_hz =  u32FreqHz,                // frequency of PWM signal
+		.speed_mode = LEDC_HS_MODE,           // timer mode
+		.timer_num = LEDC_HS_TIMER            // timer index
+	};
+	// Set configuration of timer0 for high speed channels
+	ledc_timer_config(&ledc_timer);
+
+
+	ledc_channel_config_t ledc_channel[LEDC_TEST_CH_NUM] = {
+		{
+			.channel    = LEDC_LS_CH2_CHANNEL,
+			.duty       = 0,
+			.gpio_num   = GPIO_OUTPUT_GSM_DIAG,
+			.speed_mode = LEDC_HS_MODE,
+			.hpoint     = 0,
+			.timer_sel  = LEDC_HS_TIMER
+		},
+		{
+			.channel    = LEDC_LS_CH3_CHANNEL,
+			.duty       = 0,
+			.gpio_num   = GPIO_OUTPUT_GSM_DIAG_EXT,
+			.speed_mode = LEDC_HS_MODE,
+			.hpoint     = 0,
+			.timer_sel  = LEDC_HS_MODE
+		},
+	};
+
+	// Set LED Controller with previously prepared configuration
+	for (ch = 0; ch < LEDC_TEST_CH_NUM; ch++) {
+		ledc_channel_config(&ledc_channel[ch]);
+	}
+
+	for (ch = 0; ch < LEDC_TEST_CH_NUM; ch++) {
+		ledc_set_duty(ledc_channel[ch].speed_mode, ledc_channel[ch].channel, LEDC_TEST_DUTY);
+		ledc_update_duty(ledc_channel[ch].speed_mode, ledc_channel[ch].channel);
+	}
     return(boError);
 }
 
@@ -404,9 +440,56 @@ unsigned char TaskDebug_Gps_NotFixed(sMessageType *psMessage)
 unsigned char TaskDebug_Gps_Fixed(sMessageType *psMessage)
 {
     unsigned char boError = true;
-    int ch;
 
-    boGpsHasFixed = true;
+/*	gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+	gpio_set_level(GPIO_OUTPUT_GSM_DIAG_EXT, 0);*/
+    uint32_t u32FreqHz = 2;
+	int ch;
+
+	/*
+	 * Prepare and set configuration of timers
+	 * that will be used by LED Controller
+	 */
+	ledc_timer_config_t ledc_timer = {
+		.duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
+		.freq_hz =  u32FreqHz,                // frequency of PWM signal
+		.speed_mode = LEDC_HS_MODE,           // timer mode
+		.timer_num = LEDC_HS_TIMER            // timer index
+	};
+	// Set configuration of timer0 for high speed channels
+	ledc_timer_config(&ledc_timer);
+
+
+	ledc_channel_config_t ledc_channel[LEDC_TEST_CH_NUM] = {
+		{
+			.channel    = LEDC_LS_CH2_CHANNEL,
+			.duty       = 0,
+			.gpio_num   = GPIO_OUTPUT_GSM_DIAG,
+			.speed_mode = LEDC_HS_MODE,
+			.hpoint     = 0,
+			.timer_sel  = LEDC_HS_TIMER
+		},
+		{
+			.channel    = LEDC_LS_CH3_CHANNEL,
+			.duty       = 0,
+			.gpio_num   = GPIO_OUTPUT_GSM_DIAG_EXT,
+			.speed_mode = LEDC_HS_MODE,
+			.hpoint     = 0,
+			.timer_sel  = LEDC_HS_MODE
+		},
+	};
+
+	// Set LED Controller with previously prepared configuration
+	for (ch = 0; ch < LEDC_TEST_CH_NUM; ch++) {
+		ledc_channel_config(&ledc_channel[ch]);
+	}
+
+	for (ch = 0; ch < LEDC_TEST_CH_NUM; ch++) {
+		ledc_set_duty(ledc_channel[ch].speed_mode, ledc_channel[ch].channel, LEDC_TEST_DUTY);
+		ledc_update_duty(ledc_channel[ch].speed_mode, ledc_channel[ch].channel);
+	}
+    return(boError);
+
 
     return(boError);
 }
@@ -552,8 +635,8 @@ static unsigned char ucCurrentStateIoSd = TASKIO_GSM_INITIALIZING;
 void vTaskDebug( void *pvParameters )
 {
     ESP_LOGI(DEBUG_TASK_TAG, __DATE__);
-    ESP_LOGI(DEBUG_TASK_TAG," ");
     ESP_LOGI(DEBUG_TASK_TAG,__TIME__);
+    ESP_LOGI(DEBUG_TASK_TAG,"SOFTWARE_VERSION:%s",SOFTWARE_VERSION);
     ESP_LOGI(DEBUG_TASK_TAG,"\r\n");
 
 	for( ;; )

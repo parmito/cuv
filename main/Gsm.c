@@ -41,15 +41,7 @@
 #define VIVO			3
 #define TMDATA			4
 
-#define APN VODAFONE
-
-typedef struct
-{
-	/* Command : GET or SET  */
-	unsigned char ucReponseCode;
-	/* action routine invoked for the event */
-	const char *cWifiResponse;
-}tstGsmTableResponse;
+#define APN TMDATA
 
 
 //////////////////////////////////////////////
@@ -60,7 +52,6 @@ typedef struct
 //
 //////////////////////////////////////////////
 unsigned char TaskGsm_ParseSmsResp(void);
-unsigned char TaskGsm_ParseSmsResp1(tstGsmTableResponse const *pstGsmTableResponse);
 unsigned char TaskSd_IgnoreEvent(sMessageType *psMessage);
 unsigned char TaskGsm_ParseSmsGetCsq(sMessageType *psMessage);
 unsigned char TaskGsm_ParseSmsGetCcid(sMessageType *psMessage);
@@ -70,8 +61,6 @@ unsigned char TaskGsm_DeleteSmsMsg(sMessageType *psMessage);
 unsigned char TaskGsm_SendStart(sMessageType *psMessage);
 unsigned char TaskGsm_SendCipsend(sMessageType *psMessage);
 unsigned char TaskGsm_SendData(sMessageType *psMessage);
-
-
 
 void vTaskGsm( void *pvParameters );
 
@@ -88,7 +77,7 @@ char cGsmRxBuffer[RX_BUF_SIZE];
 char cGsmSmsBuffer[RX_BUF_SIZE+10];
 char *ptrRxGsm;
 extern char cConfigAndData[RX_BUF_SIZE];
-
+extern tstConfiguration stConfigData;
 
 char cExpectedResp1[RX_BUF_SIZE_REDUCED];
 char cExpectedResp2[RX_BUF_SIZE_REDUCED];
@@ -143,7 +132,7 @@ static SMS_TYPE stSmsRecv;
 sMessageType stGsmMsg;
 static unsigned char ucGsmTry = 0;
 extern tstIo stIo;
-
+extern tstConfiguration stConfigData;
 
 static sSmsCommandType const gasTaskGsm_SmsCommandTable[] =
 {
@@ -154,6 +143,13 @@ static sSmsCommandType const gasTaskGsm_SmsCommandTable[] =
 		{	(char*)NULL,	TaskGsm_DeleteSmsMsg				}
 };
 
+typedef struct
+{
+	/* Command : GET or SET  */
+	unsigned char ucReponseCode;
+	/* action routine invoked for the event */
+	const char *cWifiResponse;
+}tstGsmTableResponse;
 
 
 //////////////////////////////////////////////
@@ -225,7 +221,7 @@ void GsmInit(void)
 								sizeof( sMessageType ) );	/* The size of each item the queue holds. */
 #endif
 
-    xTaskCreate(vTaskGsm, "vTaskGsm", 1024*4, NULL, configMAX_PRIORITIES-1, NULL);
+    xTaskCreate(vTaskGsm, "vTaskGsm", 1024*4, NULL, configMAX_PRIORITIES-7, NULL);
 	/* Create the queue used by the queue send and queue receive tasks.
 	http://www.freertos.org/a00116.html */
 
@@ -466,6 +462,15 @@ unsigned char TaskGsm_SetBaudRate(sMessageType *psMessage)
 
 	switch(ucResp)
 	{
+		case 0:
+		case 2:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = EVENT_GSM_SETBAUD;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+			boError = false;
+		break;
+
 		case 1:
 			stGsmMsg.ucSrc = SRC_GSM;
 			stGsmMsg.ucDest = SRC_GSM;
@@ -476,11 +481,6 @@ unsigned char TaskGsm_SetBaudRate(sMessageType *psMessage)
 		break;
 
 		default:
-			stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_SETBAUD;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-			boError = false;
 		break;
 	}
 
@@ -515,6 +515,15 @@ unsigned char TaskGsm_SendAt(sMessageType *psMessage)
 
     switch(ucResp)
     {
+        case 0:
+        case 2:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = EVENT_GSM_AT;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+            boError = false;
+        break;
+
         case 1:
 			stGsmMsg.ucSrc = SRC_GSM;
 			stGsmMsg.ucDest = SRC_GSM;
@@ -525,11 +534,6 @@ unsigned char TaskGsm_SendAt(sMessageType *psMessage)
         break;
 
         default:
-			stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_AT;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-            boError = false;
         break;
     }
     return(boError);
@@ -562,21 +566,23 @@ unsigned char TaskGsm_GetCcid(sMessageType *psMessage)
 
     switch(ucResp)
     {
-        case 1:
-			stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_SEND_CSQ;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-            boError = false;
-         break;
-
-        default:
+		case 0:
+		case 2:
 			stGsmMsg.ucSrc = SRC_GSM;
 			stGsmMsg.ucDest = SRC_GSM;
 			stGsmMsg.ucEvent = EVENT_GSM_GET_CCID;
 			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
 			boError = false;
 		break;
+
+
+        case 1:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = EVENT_GSM_SEND_CSQ;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+            boError = false;
+            break;
     }
     return(boError);
 }
@@ -635,8 +641,6 @@ unsigned char TaskGsm_SendCsq(sMessageType *psMessage)
 {
     unsigned char boError = true;
     static unsigned char ucResp = 0xFF;
-	char *pch= NULL;
-	int iCsq= 0;
 
     tstGsmTableResponse const gasTableGsmResponse[] =
     {
@@ -652,46 +656,26 @@ unsigned char TaskGsm_SendCsq(sMessageType *psMessage)
 
     switch(ucResp)
     {
-        case 1:
-
-        	pch = strtok (&cGsmRxBuffer[0],":");
-        	if (pch != NULL)
-        	{
-        		pch = strtok (NULL, " ");
-        		if(pch != NULL )
-        		{
-        			ESP_LOGI(GSM_TASK_TAG, "%s\r\n",pch);
-        			iCsq=atoi (pch);
-        			ESP_LOGI(GSM_TASK_TAG, "CSQ=%d\r\n",iCsq);
-        		}
-        	}
-
-        	if(iCsq < 10)
-        	{
-    			stGsmMsg.ucSrc = SRC_GSM;
-    			stGsmMsg.ucDest = SRC_GSM;
-    			stGsmMsg.ucEvent = EVENT_GSM_SEND_CSQ;
-    			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-                boError = false;
-        	}
-        	else
-        	{
-				stGsmMsg.ucSrc = SRC_GSM;
-				stGsmMsg.ucDest = SRC_GSM;
-				stGsmMsg.ucEvent = /*EVENT_GSM_SEND_CIPMUX*/EVENT_GSM_SELECT_SMS_FORMAT/*EVENT_GSM_SEND_CGATT*//*EVENT_GSM_WEB_CONNECT*/;
-				xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-
-				ucGsmTry = 0;
-				boError = true;
-        	}
-            break;
-
-        default:
+        case 2:
+        case 3:
 			stGsmMsg.ucSrc = SRC_GSM;
 			stGsmMsg.ucDest = SRC_GSM;
 			stGsmMsg.ucEvent = EVENT_GSM_SEND_CSQ;
 			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
             boError = false;
+            break;
+
+        case 1:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = /*EVENT_GSM_SEND_CIPMUX*/EVENT_GSM_SELECT_SMS_FORMAT/*EVENT_GSM_SEND_CGATT*//*EVENT_GSM_WEB_CONNECT*/;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+
+			ucGsmTry = 0;
+            boError = true;
+            break;
+
+        default:
         	break;
     }
     return(boError);
@@ -722,33 +706,34 @@ unsigned char TaskGsm_SendCgatt(sMessageType *psMessage)
 
 	switch(ucResp)
     {
-		case 1:
-			stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_SEND_CIPSTATUS;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+    	case 0:
+        case 2:
+        	if(++ucGsmTry <=10)
+        	{
+    			stGsmMsg.ucSrc = SRC_GSM;
+    			stGsmMsg.ucDest = SRC_GSM;
+    			stGsmMsg.ucEvent = EVENT_GSM_SEND_CGATT;
+    			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+        	}
+        	else
+        	{
+        		stGsmMsg.ucSrc = SRC_GSM;
+        		stGsmMsg.ucDest = SRC_GSM;
+        		stGsmMsg.ucEvent = EVENT_GSM_ERROR;
+        		xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+        		boError = false;
+        	}
             boError = false;
-            ucGsmTry = 0;
             break;
 
-		default:
-			if(++ucGsmTry <=10)
-			{
-				stGsmMsg.ucSrc = SRC_GSM;
-				stGsmMsg.ucDest = SRC_GSM;
-				stGsmMsg.ucEvent = EVENT_GSM_SEND_CGATT;
-				xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-			}
-			else
-			{
-				stGsmMsg.ucSrc = SRC_GSM;
-				stGsmMsg.ucDest = SRC_GSM;
-				stGsmMsg.ucEvent = EVENT_GSM_ERROR;
-				xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-				boError = false;
-			}
-			boError = false;
-		break;
+        case 1:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = /*EVENT_GSM_WEB_CONNECT*//*EVENT_GSM_SEND_CGDCONT*/EVENT_GSM_SEND_CIPMUX/*EVENT_GSM_SEND_CIPSHUT*//*EVENT_GSM_SEND_BEARERSET1*/;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+			ucGsmTry = 0;
+            boError = true;
+        break;
     }
 
     return(boError);
@@ -820,6 +805,8 @@ unsigned char TaskGsm_SendCgdcont(sMessageType *psMessage)
 
     memset(cLocalBuffer,0,RX_BUF_SIZE+1);
 
+
+#if 0
 #if APN == VODAFONE
     sprintf(cLocalBuffer,"AT+CGDCONT=1,\"IP\",\"%s\"\r\n",cApn);
 #elif APN == CLARO
@@ -831,6 +818,8 @@ unsigned char TaskGsm_SendCgdcont(sMessageType *psMessage)
 #else
     sprintf(cLocalBuffer,"AT+CGDCONT=1,\"IP\",\"m2m.vodafone.br\"\r\n");
 #endif
+#endif
+    sprintf(cLocalBuffer,"AT+CGDCONT=1,\"IP\",\"%s\"\r\n",stConfigData.cModemApn);
 
     static tstGsmTableResponse const gasTableGsmResponse[] =
     {
@@ -1006,6 +995,7 @@ unsigned char TaskGsm_SendCstt(sMessageType *psMessage)
 	char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);
 
     memset(cLocalBuffer,0,RX_BUF_SIZE+1);
+#if 0
 #if APN == VODAFONE
 	sprintf(cLocalBuffer,"AT+CSTT=\"%s\",\"%s\",\"%s\"\r\n",cApn,cApnLogin,cApnPassword);
 #elif APN == CLARO
@@ -1017,7 +1007,8 @@ unsigned char TaskGsm_SendCstt(sMessageType *psMessage)
 #else
 	sprintf(cLocalBuffer,"AT+CSTT=\"m2m.vodafone.br\",\"\",\"\"\r\n");
 #endif
-
+#endif
+	sprintf(cLocalBuffer,"AT+CSTT=\"%s\",\"%s\",\"%s\"\r\n",stConfigData.cModemApn,stConfigData.cModemApnLogin,stConfigData.cModemApnPassword);
 
     tstGsmTableResponse const gasTableGsmResponse[] =
     {
@@ -1133,14 +1124,14 @@ unsigned char TaskGsm_ListSmsMsg(sMessageType *psMessage)
     };
 
 	TaskGsm_SendAtCmd1("GSM:CMGL\r\n","AT+CMGL=\"REC UNREAD\",1\r\n");
-	ucResp = TaskGsm_WaitResponse1(&gasTableGsmResponse[0],TaskGsm_ParseSmsResp1,1,5);
+	ucResp = TaskGsm_WaitResponse1(&gasTableGsmResponse[0],TaskGsm_ParseResp1,1,5);
 
     switch(ucResp)
     {
         case 1:
             stGsmMsg.ucSrc = SRC_GSM;
             stGsmMsg.ucDest = SRC_GSM;
-            stGsmMsg.ucEvent = EVENT_GSM_DECODE_SMS_MSG;
+            stGsmMsg.ucEvent = /*EVENT_GSM_SEND_CGATT*/EVENT_GSM_DECODE_SMS_MSG;
 			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
             boError = true;
         break;
@@ -1206,58 +1197,6 @@ unsigned char TaskGsm_ParseSmsResp(void)
             ucResp = 2;
         }
     }
-    return(ucResp);
-}
-
-//////////////////////////////////////////////
-//
-//
-//              TaskGsm_ParseSmsResp1
-//
-//
-//////////////////////////////////////////////
-unsigned char TaskGsm_ParseSmsResp1(tstGsmTableResponse const *pstGsmTableResponse)
-{
-	unsigned char ucResp = 0;
-	const char *ptr=NULL;
-    SMS_TYPE *ptrSms = &stSmsRecv;
-
-	tstGsmTableResponse const *pst = pstGsmTableResponse;
-
-	while(pst->ucReponseCode != 255){
-
-		ptr = strstr((const char*)&cGsmRxBuffer[0],pst->cWifiResponse);
-		if(ptr != NULL)
-		{
-			if(pst->ucReponseCode == 1)
-			{
-		        ESP_LOGI(GSM_TASK_TAG, "\r\n<<<<RESP:1 GSM>>>>\r\n%s\r\n<<<<>>>>\r\n",cGsmRxBuffer);
-
-		        ptr+=(sizeof(cCGML)-1);
-		        ptr = strtok((char*)ptr,",");
-		        strcpy(ptrSms->cIndexMsg,ptr);
-
-		        ESP_LOGI(GSM_TASK_TAG, "\r\n<<<<INDEX>>>>\r\n%s\r\n<<<<>>>>\r\n",ptrSms->cIndexMsg);
-
-		        ptr=strtok(NULL,",");
-		        ptr=strtok(NULL,",");
-		        strcpy(ptrSms->cPhoneNumber,ptr);
-		        ESP_LOGI(GSM_TASK_TAG, "\r\n<<<<PHONE>>>>\r\n%s\r\n<<<<>>>>\r\n",ptrSms->cPhoneNumber);
-
-		        ptr=strtok(NULL,",");
-		        ptr=strtok(NULL,",");
-		        ptr=strtok(NULL,"\r\n");
-		        ptr=strtok(NULL,"\r\n");
-		        strcpy(ptrSms->cMessageText,ptr);
-		        ESP_LOGI(GSM_TASK_TAG, "\r\n<<<<TEXT>>>>\r\n%s\r\n<<<<>>>>\r\n",ptrSms->cMessageText);
-
-			}
-	        ucResp = pst->ucReponseCode;
-	        ESP_LOGI(GSM_TASK_TAG, "\r\n<<<<PARSE1 RESP:%d GSM>>>>\r\n%s\r\n<<<<>>>>\r\n",ucResp,cGsmRxBuffer/*pst->cWifiResponse*/);
-			break;
-		}
-		pst++;
-	}
     return(ucResp);
 }
 
@@ -1638,53 +1577,7 @@ unsigned char TaskGsm_DeleteSmsMsg(sMessageType *psMessage)
 			stGsmMsg.ucEvent = EVENT_GSM_SEND_CGATT;
 			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
             boError = true;
-        break;
 
-        default:
-        	stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_DELETE_SMS_MSG;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-            boError = false;
-        break;
-    }
-
-    free(cLocalBuffer);
-    return(boError);
-}
-
-//////////////////////////////////////////////
-//
-//
-//           TaskGsm_DeleteSmsMsg1
-//
-//
-//////////////////////////////////////////////
-unsigned char TaskGsm_DeleteSmsMsg1(sMessageType *psMessage)
-{
-    unsigned char boError = true;
-    SMS_TYPE *ptrSms = &stSmsRecv;
-
-	char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);
-
-    memset(cLocalBuffer,0,RX_BUF_SIZE+1);
-    strcpy(cLocalBuffer,"AT+CMGD=");
-    strcat(cLocalBuffer,ptrSms->cIndexMsg);
-    strcat(cLocalBuffer,",0\r\n");
-
-    TaskGsm_SendAtCmd("GSM:CMGD\r\n",cLocalBuffer,cModem_OK,cModem_ERROR);
-
-    static unsigned char ucResp = 0xFF;
-    ucResp = TaskGsm_WaitResponse(TaskGsm_ParseResp,1, 20);
-
-    switch(ucResp)
-    {
-        case 1:
-        	stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = EVENT_GSM_SEND_CGATT;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-            boError = true;
         break;
 
         default:
@@ -2648,16 +2541,8 @@ unsigned char TaskGsm_SendHttpCid(sMessageType *psMessage)
 
     switch(ucResp)
     {
-        case 1:
-			stGsmMsg.ucSrc = SRC_GSM;
-			stGsmMsg.ucDest = SRC_GSM;
-			stGsmMsg.ucEvent = /*EVENT_GSM_SEND_HTTPURL*/EVENT_GSM_WEB_CONNECT;
-			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
-			ucGsmTry  = 0;
-            boError = true;
-        break;
-
-        default:
+        case 0:
+        case 2:
         	if(++ucGsmTry <= 3)
         	{
 				stGsmMsg.ucSrc = SRC_GSM;
@@ -2673,6 +2558,18 @@ unsigned char TaskGsm_SendHttpCid(sMessageType *psMessage)
 				xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
         	}
             boError = false;
+        break;
+
+        case 1:
+			stGsmMsg.ucSrc = SRC_GSM;
+			stGsmMsg.ucDest = SRC_GSM;
+			stGsmMsg.ucEvent = /*EVENT_GSM_SEND_HTTPURL*/EVENT_GSM_WEB_CONNECT;
+			xQueueSend( xQueueGsm, ( void * )&stGsmMsg, 0);
+			ucGsmTry  = 0;
+            boError = true;
+        break;
+
+        default:
         break;
     }
     return(boError);
@@ -3265,7 +3162,7 @@ unsigned char TaskGsm_SendStart(sMessageType *psMessage)
 	char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);
 
     memset(cLocalBuffer,0,RX_BUF_SIZE+1);
-    sprintf(cLocalBuffer,"%s%s%s\r\n",cHttpAtStartCIP,cHttpDns,cHttpAtEndCIP);
+    sprintf(cLocalBuffer,"%s%s%s\r\n",cHttpAtStartCIP,stConfigData.cHttpDomain,cHttpAtEndCIP);
     TaskGsm_SendAtCmd("GSM:>START\r\n",cLocalBuffer,"CONNECT",cModem_ERROR);
 
     unsigned char ucResp;

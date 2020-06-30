@@ -23,13 +23,15 @@
 #include "defines.h"
 #include "State.h"
 #include "http_client.h"
-
+#include "Ble.h"
 #include "esp_http_client.h"
 
 #define MAX_HTTP_RECV_BUFFER 512
 extern char cConfigAndData[RX_BUF_SIZE];
 /*extern unsigned char ucCurrentStateGsm;*/
 sMessageType stHttpCliMsg;
+extern tstConfiguration stConfigData;
+
 
 static unsigned char ucCurrentStateHttpCli = TASKHTTPCLI_IDLING;
 static const char *TAG = "HTTP_CLIENT";
@@ -355,6 +357,7 @@ static void http_perform_as_stream_reader()
     free(buffer);
 }
 
+
 static void http_post(const char *post_data)
 {
 	char* cLocalBuffer = (char*) malloc(6+1);
@@ -362,7 +365,7 @@ static void http_post(const char *post_data)
     char *ptr = NULL;
 
     esp_http_client_config_t config = {
-        .url = "http://gpslogger.esy.es/pages/upload/index.php",
+        .url = stConfigData.cPageUrl,
         .event_handler = _http_event_handler,
         .is_async = false,
         .timeout_ms = 5000,
@@ -407,6 +410,13 @@ static void http_post(const char *post_data)
     else
     {
         ESP_LOGE(TAG, "Error perform http request %s", esp_err_to_name(err));
+
+    	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+    	stHttpCliMsg.ucDest = SRC_HTTPCLI;
+    	stHttpCliMsg.ucEvent = EVENT_HTTPCLI_DISCONNECTED;
+    	xQueueSend( xQueueHttpCli, ( void * )&stHttpCliMsg, 0);
+
+    	esp_http_client_close(client);
     }
 
     free(cLocalBuffer);
@@ -425,6 +435,7 @@ unsigned char TaskHttpCli_Init(sMessageType *psMessage)
 
     ESP_LOGI(TAG, "<<<<HTTPCLI INIT>>>>\r\n");
 
+
 	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_HTTPCLI;
 	stHttpCliMsg.ucEvent = EVENT_HTTPCLI_CONNECTING;
@@ -433,7 +444,7 @@ unsigned char TaskHttpCli_Init(sMessageType *psMessage)
     return(boError);
 }
 
-
+static char cLocalBuffer[64];
 //////////////////////////////////////////////
 //
 //
@@ -444,16 +455,27 @@ unsigned char TaskHttpCli_Init(sMessageType *psMessage)
 unsigned char TaskHttpCli_Connecting(sMessageType *psMessage)
 {
     unsigned char boError = true;
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
 
     ESP_LOGI(TAG, "<<<<HTTPCLI CONNECTING>>>>\r\n");
 
     esp_wifi_connect();
-    /*app_wifi_wait_connected();*/
+    app_wifi_wait_connected();
 
 	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_CONNECTING;
 	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+
+
+	sprintf(cLocalBuffer,"HTTP CONNECTING\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
 
     return(boError);
@@ -469,6 +491,7 @@ unsigned char TaskHttpCli_Connecting(sMessageType *psMessage)
 unsigned char TaskHttpCli_Connected(sMessageType *psMessage)
 {
     unsigned char boError = true;
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
 
     ESP_LOGI(TAG, "<<<<HTTPCLI CONNECTED>>>>\r\n");
 
@@ -476,6 +499,15 @@ unsigned char TaskHttpCli_Connected(sMessageType *psMessage)
     stHttpCliMsg.ucDest = SRC_SD;
     stHttpCliMsg.ucEvent = EVENT_SD_OPENING;
     xQueueSend( xQueueSd, ( void * )&stHttpCliMsg, 0);
+
+	sprintf(cLocalBuffer,"HTTP CONNECTED\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
     return(boError);
 }
@@ -492,6 +524,8 @@ unsigned char TaskHttpCli_Post(sMessageType *psMessage)
 {
     unsigned char boError = true;
 
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
+
     ESP_LOGI(TAG, "<<<<HTTPCLI POSTING>>>>\r\n");
 
     http_post(cConfigAndData);
@@ -500,6 +534,15 @@ unsigned char TaskHttpCli_Post(sMessageType *psMessage)
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_COMMUNICATING;
 	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+
+	sprintf(cLocalBuffer,"HTTP POSTING\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
     return(boError);
 }
@@ -516,7 +559,7 @@ unsigned char TaskHttpCli_Posted(sMessageType *psMessage)
 {
     unsigned char boError = true;
 
-    ESP_LOGE(TAG, "<<<<HTTP POSTED>>>>\r\n");
+    ESP_LOGI(TAG, "<<<<HTTP POSTED>>>>\r\n");
 
 	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_SD;
@@ -527,6 +570,16 @@ unsigned char TaskHttpCli_Posted(sMessageType *psMessage)
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_UPLOAD_DONE;
 	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
+	sprintf(cLocalBuffer,"HTTP POSTED\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
     return(boError);
 }
@@ -542,12 +595,23 @@ unsigned char TaskHttpCli_Disconnected(sMessageType *psMessage)
 {
     unsigned char boError = true;
 
-    ESP_LOGI(TAG, "<<<<HTTP DISCONNECTED>>>>\r\n");
+    ESP_LOGW(TAG, "<<<<HTTP DISCONNECTED>>>>\r\n");
 
+    esp_wifi_disconnect();
 	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_HTTPCLI;
 	stHttpCliMsg.ucEvent = EVENT_HTTPCLI_INIT;
 	xQueueSend( xQueueHttpCli, ( void * )&stHttpCliMsg, 0);
+
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
+	sprintf(cLocalBuffer,"HTTP DISCONNECTED\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
     return(boError);
 }
@@ -563,7 +627,7 @@ unsigned char TaskHttpCli_Ending(sMessageType *psMessage)
 {
 	unsigned char boError = true;
 
-    ESP_LOGI(TAG, "<<<<HTTPCLI:>ENDING>>>>\r\n");
+    ESP_LOGW(TAG, "<<<<HTTPCLI:>ENDING>>>>\r\n");
 
 	vTaskDelay(2000/portTICK_PERIOD_MS);
 
@@ -571,6 +635,21 @@ unsigned char TaskHttpCli_Ending(sMessageType *psMessage)
 	stHttpCliMsg.ucDest = SRC_SD;
 	stHttpCliMsg.ucEvent = EVENT_SD_OPENING;
 	xQueueSend( xQueueSd, ( void * )&stHttpCliMsg, 0);
+
+	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
+	sprintf(cLocalBuffer,"HTTP ENDING\r\n");
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_BLE;
+	stHttpCliMsg.ucEvent = (int)NULL;
+	stHttpCliMsg.pcMessageData = &cLocalBuffer[0];
+	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
+
+
+	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	stHttpCliMsg.ucDest = SRC_DEBUG;
+	stHttpCliMsg.ucEvent = EVENT_IO_GSM_INIT;
+	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
 
 	return(boError);
 }
@@ -700,7 +779,7 @@ void Http_Init(void)
 
     app_wifi_initialise();
 
-    xTaskCreate(&http_task, "http_task", 4096, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(&http_task, "http_task", 4096, NULL, configMAX_PRIORITIES-6, NULL);
 
 }
 

@@ -1,13 +1,15 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
+#include "driver/can.h"
 #include <time.h>
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#define SW_VERSION "2.0.0"
+#define SOFTWARE_VERSION 		(char*)"2.0.0"
+
 #define MODEM_ATTEMPT			3
 
 
@@ -24,8 +26,8 @@
 
 #define DEBUG_GPS 				1
 #define DEBUG_SDCARD 			1
-#define DEBUG_IO				0
-#define DEBUG_WIFI				1
+#define DEBUG_IO				1
+#define DEBUG_WIFI				0
 #define DEBUG_GSM				1
 
 #define TASK_IO_TIMEOUT  		(unsigned long)(25)
@@ -87,6 +89,7 @@
 #define EVENT_SD_WRITING_TEL1       				(unsigned char)13
 #define EVENT_SD_WRITING_TEL2       				(unsigned char)14
 #define EVENT_SD_WRITING_TEL3       				(unsigned char)15
+#define EVENT_SD_READWRITE_CONFIG      				(unsigned char)16
 
 
  /* EVENTS DEBUG*/
@@ -117,6 +120,14 @@
 
 #define EVENT_IO_GPS_FIXED		    (unsigned char)8
 #define EVENT_IO_GPS_NOT_FIXED      (unsigned char)9
+
+#define	EVENT_IO_INIT				(unsigned char)10
+#define	EVENT_IO_ADD_CAN_MESSAGE	(unsigned char)11
+#define	EVENT_IO_ERROR				(unsigned char)12
+#define EVENT_IO_NULL				(unsigned char)13
+
+#define TASKIO_IDLING 				(unsigned char)0
+#define TASKIO_INITIALIZING 		(unsigned char)1
 
 /* States*/
 #define TASKIO_GSM_INITIALIZING    	(unsigned char)0
@@ -254,6 +265,12 @@
 #define EVENT_GSM_SEND_CIPMODE				(unsigned char)70
 #define EVENT_GSM_GET_CCID					(unsigned char)71
 
+
+#define EVENT_GSM_SEND_HTTPURL_TIMESTAMP	(unsigned char)72
+#define EVENT_GSM_SEND_HTTPACTION_TIMESTAMP	(unsigned char)73
+#define EVENT_GSM_SEND_HTTPREAD_TIMESTAMP	(unsigned char)74
+#define EVENT_GSM_SEND_HTTPTERM_TIMESTAMP	(unsigned char)75
+
 /* States*/
 #define TASKGSM_IDLING    		    		(unsigned char)(0)
 #define TASKGSM_INITIALIZING    			(unsigned char)(1)
@@ -273,6 +290,8 @@
 #define TIMER_GSM_1SECOND_TIMEOUT			(unsigned char)5
 #define TIMER_GSM_LAST   					(unsigned char)6/*Always the last one*/
 
+
+
  /* Events*/
 #define EVENT_HTTPCLI_NULL         					(unsigned char)0
 #define EVENT_HTTPCLI_INIT 							(unsigned char)1
@@ -281,23 +300,14 @@
 #define EVENT_HTTPCLI_POST         					(unsigned char)4
 #define EVENT_HTTPCLI_POSTED         				(unsigned char)5
 #define EVENT_HTTPCLI_DISCONNECTED					(unsigned char)6
-#define EVENT_HTTPCLI_ENDING						(unsigned char)7
+#define EVENT_HTTPCLI_SYNCTS         				(unsigned char)7
+#define EVENT_HTTPCLI_ENDING						(unsigned char)8
+#define EVENT_HTTPCLI_ERROR							(unsigned char)9
 
  /* States*/
 #define TASKHTTPCLI_IDLING			   				(unsigned char)(0)
 #define TASKHTTPCLI_INITIALIZING    				(unsigned char)(1)
 #define TASKHTTPCLI_COMMUNICATING    				(unsigned char)(2)
-
- /* Events*/
-#define EVENT_IO_NULL         						(unsigned char)0
-#define EVENT_IO_INIT	 							(unsigned char)1
-#define EVENT_IO_ERROR	 							(unsigned char)2
-#define EVENT_IO_ADD_CAN_MESSAGE					(unsigned char)3
-
- /* States*/
-#define TASKIO_IDLING				   				(unsigned char)(0)
-#define TASKIO_INITIALIZING	    					(unsigned char)(1)
-
 
 
 /* Installed sources*/
@@ -309,7 +319,7 @@
 #define SRC_HTTPCLI 6
 #define SRC_BLE		7
 #define SRC_IO		8
-
+#define SRC_HTTPSRV 9
 
  /* The number of items the queue can hold.  This is 1 as the receive task
  will remove items as they are added, meaning the send task should always find
@@ -319,12 +329,31 @@
 #define gsmQUEUE_LENGTH						( 5 )
 #define wifiQUEUE_LENGTH					( 5 )
 #define httcliQUEUE_LENGTH					( 5	)
-#define httcliQUEUE_LENGTH					( 5	)
-#define bleQUEUE_LENGTH						( 10 )
+#define httsrvQUEUE_LENGTH					( 5	)
+#define ultraQUEUE_LENGTH					( 5 )
+#define bleQUEUE _LENGTH					( 10 )
 #define ioQUEUE_LENGTH						( 5 )
+
+
+ typedef struct{
+ 	unsigned long u32TimeToSleepInSec;
+ 	unsigned long u32PeriodLogInSec;
+ 	char cBuzzerStatus[RX_BUF_SIZE_REDUCED>>2];
+ 	char cWifiApName[RX_BUF_SIZE_REDUCED >>1];
+ 	char cWifiApPassword[RX_BUF_SIZE_REDUCED];
+ 	char cHttpDomain[RX_BUF_SIZE_REDUCED];
+ 	char cPageUrl[RX_BUF_SIZE_REDUCED];
+ 	char cModemApn[RX_BUF_SIZE_REDUCED];
+ 	char cModemApnLogin[RX_BUF_SIZE_REDUCED];
+ 	char cModemApnPassword[RX_BUF_SIZE_REDUCED];
+ 	unsigned long u32ModemPeriodTxInSec;
+ 	char cAppSource[RX_BUF_SIZE_REDUCED >>2];
+ 	char cConfigFileVersion[RX_BUF_SIZE_REDUCED>>2];
+ }tstConfiguration;
 
 typedef struct
 {
+	unsigned char ucSelector;
  	unsigned char ucIgnition;
  	unsigned int u16AdMainBatteryVoltage;
  	float flAdMainBatteryVoltage;
@@ -383,7 +412,7 @@ typedef struct
 
 
 /* IO MAPPING*/
-#define GPIO_OUTPUT_GSM_DIAG    				12/*TDI*/
+#define GPIO_OUTPUT_GSM_DIAG    				12
 #define GPIO_OUTPUT_GSM_DIAG_PIN_SEL  			((1ULL<<GPIO_OUTPUT_GSM_DIAG))
 
 #define GPIO_OUTPUT_GSM_ENABLE    				23
@@ -394,7 +423,7 @@ typedef struct
 #define GPIO_OUTPUT_OUT1	    				26
 #define GPIO_OUTPUT_OUT1_PIN_SEL  				((1ULL<<GPIO_OUTPUT_OUT1))
 
-#define GPIO_OUTPUT_GPS_ENABLE    				14/*TMS*/
+#define GPIO_OUTPUT_GPS_ENABLE    				14
 #define GPIO_OUTPUT_GPS_ENABLE_PIN_SEL  		((1ULL<<GPIO_OUTPUT_GPS_ENABLE))
 
 #define GPIO_OUTPUT_GSM_DIAG_EXT   				33
@@ -406,7 +435,11 @@ typedef struct
 #define GPIO_INPUT_ADC_MAINBATTERY 				39
 #define GPIO_INPUT_ADC_PIN_SEL  				((1ULL<<GPIO_INPUT_ADC_MAINBATTERY))
 
+#define GPIO_OUTPUT_ULTRA_TRIGGER  				27
+#define GPIO_OUTPUT_ULTRA_TRIGGER_PIN_SEL  		((1ULL<<GPIO_OUTPUT_ULTRA_TRIGGER))
 
+#define GPIO_INPUT_SELECTOR    					21
+#define GPIO_INPUT_SELECTOR_PIN_SEL  			((1ULL<<GPIO_INPUT_SELECTOR))
 
 
 
@@ -416,6 +449,13 @@ typedef struct
 #define GPS_TX	 					16/*	UART1-RX	*/
 #define GPS_RX 						17/*	UART1-TX	*/
 
+#define SIZE_OF_STRUCT 20
+//Configure message to transmit
+typedef struct{
+	unsigned long u32Timeout;
+	unsigned long u32Period;
+	can_message_t stCan;
+}tstCanMessage;
 
 
 /*#define GPS_ENABLE		PB1

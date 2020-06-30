@@ -39,6 +39,8 @@ Gps.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gps.c \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ /home/danilo/esp/esp-idf/components/log/include/esp_log.h \
+ /home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h \
  /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
  /home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h \
  /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/gpio.h \
@@ -52,13 +54,11 @@ Gps.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gps.c \
  /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h \
  /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h \
  /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h \
- /home/danilo/esp/esp-idf/components/log/include/esp_log.h \
- /home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h \
- /home/danilo/esp/esp-idf/examples/get-started/cuv/main/tinygps.h \
- /home/danilo/esp/esp-idf/examples/get-started/cuv/main/integer.h \
  /home/danilo/esp/esp-idf/components/driver/include/driver/can.h \
  /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/tinygps.h \
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/main/integer.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Debug.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Ble.h \
@@ -144,6 +144,10 @@ Gps.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gps.c \
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
+/home/danilo/esp/esp-idf/components/log/include/esp_log.h:
+
+/home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h:
+
 /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
 
 /home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h:
@@ -170,19 +174,15 @@ Gps.o: /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Gps.c \
 
 /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h:
 
-/home/danilo/esp/esp-idf/components/log/include/esp_log.h:
-
-/home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h:
-
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h:
-
-/home/danilo/esp/esp-idf/examples/get-started/cuv/main/tinygps.h:
-
-/home/danilo/esp/esp-idf/examples/get-started/cuv/main/integer.h:
 
 /home/danilo/esp/esp-idf/components/driver/include/driver/can.h:
 
 /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
+
+/home/danilo/esp/esp-idf/examples/get-started/cuv/main/tinygps.h:
+
+/home/danilo/esp/esp-idf/examples/get-started/cuv/main/integer.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/Sd.h:
 

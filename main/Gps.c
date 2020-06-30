@@ -15,20 +15,17 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
-#include "driver/gpio.h"
 #include "esp_system.h"
 #include "esp_log.h"
+#include "driver/gpio.h"
+
 #include "defines.h"
 #include "tinygps.h"
-#include "driver/gpio.h"
-#include "driver/can.h"
-
 
 #include "Sd.h"
 #include "Debug.h"
 #include "Ble.h"
 #include "Gps.h"
-
 
 void vTaskGps( void *pvParameters );
 
@@ -45,8 +42,8 @@ tstIo stIo = {
 	{0},/*float flAdBackupBatteryVoltage;*/
 	{0},/*float flI2cTemperature;*/
 	{0},/*unsigned int u16IntTemperature;*/
-	{0},/*char cLatitude[20];*/
-	{0},/*char cLongitude[20];*/
+	{{0}},/*char cLatitude[20];*/
+	{{0}},/*char cLongitude[20];*/
 	{0},/*unsigned char ucNumSat;*/
 	{0},/*unsigned char ulHdop;*/
 	{0},/*int altitude;*/
@@ -56,10 +53,11 @@ tstIo stIo = {
 	{0}/*struct tm t;*/
 };
 
-extern unsigned long u32PeriodLog;
-unsigned long u32QtyFilesStored;
-static unsigned char mac[6];
 static const char *GPS_TASK_TAG = "GPS_TASK";
+extern tstConfiguration stConfigData;
+unsigned long u32QtyFilesStored;
+
+static unsigned char mac[6];
 
 #define MAX_PRECISION	(10)
 static const double rounders[MAX_PRECISION + 1] =
@@ -175,8 +173,6 @@ char * ftoa(double f, char * buf, int precision)
 //////////////////////////////////////////////
 void Gps_On(void)
 {
-    ESP_LOGI(GPS_TASK_TAG, "GPS_ON");
-
 	gpio_set_level(GPIO_OUTPUT_GPS_ENABLE, 1);
 }
 
@@ -189,9 +185,6 @@ void Gps_On(void)
 //////////////////////////////////////////////
 void Gps_Off(void)
 {
-	/*esp_log_level_set(GSM_TASK_TAG, ESP_LOG_INFO);*/
-    ESP_LOGI(GPS_TASK_TAG, "GPS_OFF");
-
 	gpio_set_level(GPIO_OUTPUT_GPS_ENABLE, 0);
 }
 
@@ -204,7 +197,6 @@ void Gps_Off(void)
 //////////////////////////////////////////////
 void Gps_Io_Configuration(void)
 {
-
 	gpio_config_t io_conf;
 	//disable interrupt
 	io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
@@ -220,10 +212,7 @@ void Gps_Io_Configuration(void)
 
 	gpio_config(&io_conf);
 
-	//Initialize configuration structures using macro initializers
-	can_general_config_t g_config = CAN_GENERAL_CONFIG_DEFAULT(GPIO_NUM_21, GPIO_NUM_22, CAN_MODE_NORMAL);
-	can_timing_config_t t_config = CAN_TIMING_CONFIG_500KBITS();
-	can_filter_config_t f_config = CAN_FILTER_CONFIG_ACCEPT_ALL();
+
 
 
 	Gps_On();
@@ -238,14 +227,14 @@ void Gps_Io_Configuration(void)
 //////////////////////////////////////////////
 void GpsInit(void)
 {
-	/*esp_log_level_set(GSM_TASK_TAG, ESP_LOG_INFO);*/
-    ESP_LOGI(GPS_TASK_TAG, "GPS INIT");
+	ESP_LOGI(GPS_TASK_TAG, "GPS INIT");
 
 	Gps_Io_Configuration();
-    xTaskCreate(vTaskGps, "vTaskGps", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+
+    xTaskCreate(vTaskGps, "vTaskGps", 1024*2, NULL, configMAX_PRIORITIES-5, NULL);
 
 	(void)esp_efuse_mac_get_default(&mac[0]);
-	ESP_LOGI(GPS_TASK_TAG, "MAC=%x:%x:%x:%x:%x:%x",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+	/*ESP_LOGI(GPS_TASK_TAG, "MAC=%x:%x:%x:%x:%x:%x",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);*/
 }
 
 
@@ -261,12 +250,9 @@ void vTaskGps( void *pvParameters )
 	char cfAdMainBatteryVoltage[20];
     /*char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);*/
 
-
     static unsigned char ucCurrIgnition = 0xFF;
     static bool boGpsHasFixedOnce = false;
     static char cLocalBuffer[64];
-
-
     /*esp_log_level_set(GPS_TASK_TAG, ESP_LOG_INFO);*/
 
 
@@ -279,12 +265,17 @@ void vTaskGps( void *pvParameters )
 
 	for( ;; )
 	{
-	    ESP_LOGI(GPS_TASK_TAG, "Running...");
+	    /*ESP_LOGI(GPS_TASK_TAG, "Running...");*/
 
 		ucFixData = gps_fix_data();
 		if( ucFixData == 1)
 		{
 			ESP_LOGI(GPS_TASK_TAG, "<<<<FIXING>>>>\r\n");
+
+			stGpsMsg.ucSrc = SRC_GPS;
+			stGpsMsg.ucDest = SRC_DEBUG;
+			stGpsMsg.ucEvent = EVENT_IO_GPS_FIXED;
+			xQueueSend( xQueueDebug, ( void * )&stGpsMsg, 0);
 
 			boGpsHasFixedOnce = true;
 			/*stGpsMsg.ucSrc = SRC_GPS;
@@ -393,7 +384,7 @@ void vTaskGps( void *pvParameters )
 				/* IGN was OFF and now is ON*/
 				ucCurrIgnition = stIo.ucIgnition;
 
-				if(++u32PeriodGpsWriteSd >= u32PeriodLog)
+				if(++u32PeriodGpsWriteSd >= stConfigData.u32PeriodLogInSec)
 				{
 					u32PeriodGpsWriteSd = 0;
 

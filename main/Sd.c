@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/param.h>
-#include <dirent.h>
+#include <sys/dirent.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -26,67 +26,63 @@
 #include <esp_system.h>
 #include <esp_spi_flash.h>
 #include <rom/spi_flash.h>
+#include <ff.h>
 
 #include "defines.h"
 #include "State.h"
 #include "Gsm.h"
 #include "Sd.h"
-#include "http_client.h"
 #include "Ble.h"
+#include "http_client.h"
 
-
+//////////////////////////////////////////////
+//
+//
+//            FUNCTION PROTOTYPES
+//
+//
+//////////////////////////////////////////////
 void vTaskSd( void *pvParameters );
 unsigned char TaskSd_Writing(sMessageType *psMessage);
 unsigned char TaskSd_IgnoreEvent(sMessageType *psMessage);
+unsigned char ucSdWriteWifiApName(char* a);
+unsigned char ucSdAppSource(char* a);
+unsigned char ucSdWriteWifiApPassword(char* a);
+unsigned char ucSdWritePeriodLogInSec(char* a);
+unsigned char ucSdWriteModemPeriodTxInSec(char* a);
+unsigned char ucSdWriteModemApn(char* a);
+unsigned char ucSdWriteModemApnLogin(char* a);
+unsigned char ucSdWriteModemApnPassword(char* a);
+unsigned char ucSdWriteTimeToSleep(char* a);
+unsigned char ucSdDoNothing(char* a);
 
+//////////////////////////////////////////////
+//
+//
+//              VARIABLES
+//
+//
+//////////////////////////////////////////////
 unsigned long u32TimeToSleep;
 unsigned long u32TimeToWakeup;
-unsigned long u32PeriodLog = 10;
-unsigned long u32PeriodTx;
-static unsigned char boBuzzerStatus;
 
-char cWifiApName[RX_BUF_SIZE_REDUCED];
-char cWifiApPassword[RX_BUF_SIZE_REDUCED];
-char cApn[RX_BUF_SIZE_REDUCED];
-char cApnLogin[RX_BUF_SIZE_REDUCED];
-char cApnPassword[RX_BUF_SIZE_REDUCED];
-char cHttpDns[RX_BUF_SIZE_REDUCED];
-char cWebPage[RX_BUF_SIZE_REDUCED];
-
-
-const char cConfigText[]= {"CONFIG/CONFIG.txt"};
-const char cTimeToSleep[] = {"TS="};
-const char cPeriodLog[]  = {"PL="};
-const char cBuzzerStatus[]  = {"BZ="};
-const char cWifiSettings[]  = {"WIFI="};
-const char cHttpSettings[]  = {"HTTP="};
-const char cPageUrl[]  = {"PAGE="};
-const char cModemApn[]  = {"APN="};
-const char cModemPeriodTx[] = {"PTX="};
-
-
-const char cConfigData[]=
+tstConfiguration stConfigData =
 {
-		"\
-		TS=300\r\n\
-		PL=30\r\n\
-		BZ=OFF\r\n\
-		WIFI=Iphone4_EXT,poliana90\r\n\
-		HTTP=gpslogger.esy.es\r\n\
-		PAGE=http://gpslogger.esy.es/pages/upload/index.php\r\n\
-		APN=vodafone.br, , \r\n\
-		PTX=120\r\n"
+	.u32TimeToSleepInSec = (unsigned long)180,
+	.u32PeriodLogInSec = (unsigned long)30,
+	.cBuzzerStatus = "OFF",
+	.cWifiApName= "Iphone4_EXT",
+	.cWifiApPassword = "poliana90",
+	.cHttpDomain = "gpslogger.esy.es",
+	.cPageUrl = "http://gpslogger.esy.es/pages/upload/index.php",
+	.cModemApn = "vodafone.br",
+	.cModemApnLogin = " ",
+	.cModemApnPassword = " ",
+	.u32ModemPeriodTxInSec = (unsigned long)120,
+	.cAppSource ="SRC_WIFI",
+	.cConfigFileVersion = "2.0"
 };
-
-/*const char cConfigTimeToSleep[] = {"TS=120\r\n"};
-const char cConfigPeriodLog[]  = {"PL=30\r\n"};
-const char cConfigBuzzerStatus[]  = {"BZ=OFF\r\n"};
-const char cConfigWifiSettings[]  = {"WIFI=Iphone4_EXT,poliana90\r\n"};
-const char cConfigHttpSettings[]  = {"HTTP=gpslogger.esy.es\r\n"};
-const char cConfigPageUrl[]  = {"PAGE=http://gpslogger.esy.es/pages/upload/index.php\r\n"};
-const char cConfigModemApn[]  = {"APN=zap.vivo.com.br, , \r\n"};
-const char cConfigModemPeriodTx[] = {"PTX=120\r\n"};*/
-
+const char cConfigText[]= {"CONFIG/CONFIG.txt"};
 
 char szFilenameToBeRead[RX_BUF_SIZE+1];
 char  cConfigAndData[RX_BUF_SIZE+1];
@@ -97,10 +93,368 @@ extern unsigned char ucCurrentStateGsm;
 static long int liFilePointerPositionBeforeReading = 0;
 static long int liFilePointerPositionAfterReading = 0;
 
+char cConfigHttpRxBuffer[RX_BUF_SIZE];
+char cConfigUartRxBuffer[RX_BUF_SIZE];
+char *ptrRxConfig;
+
+
 /*extern tstIo stIo;*/
 sMessageType stSdMsg;
 
 static const char *SD_TASK_TAG = "SD_TASK";
+
+typedef struct{
+    unsigned char ucIndex;
+    char cIdentifier[RX_BUF_SIZE_REDUCED];
+    char cParam1[RX_BUF_SIZE_REDUCED];
+    unsigned char (*ucFuncPtr)(char *a);
+}tstReadWriteDataByIdentifier;
+
+tstReadWriteDataByIdentifier const astReadWriteTable[] =
+{
+    { 1, "CONF:","WIFIAPNAME:",ucSdWriteWifiApName},
+    { 2, "CONF:","WIFIAPPASSWORD:",ucSdWriteWifiApPassword},
+	{ 3, "CONF:","PERIODLOGINSEC:",ucSdWritePeriodLogInSec},
+	{ 4, "CONF:","MODEMPERIODTXINSEC:",ucSdWriteModemPeriodTxInSec},
+	{ 5, "CONF:","APPSOURCE:",ucSdAppSource},
+	{ 6, "CONF:","MODEMAPN:",ucSdWriteModemApn},
+	{ 7, "CONF:","MODEMAPNLOGIN:",ucSdWriteModemApnLogin},
+	{ 8, "CONF:","MODEMAPNPASSWORD:",ucSdWriteModemApnPassword},
+	{ 9, "CONF:","TIMETOSLEEP:",ucSdWriteTimeToSleep},
+    { 255, "END OF ARRAY:","END OF ARRAY",ucSdDoNothing}
+};
+
+
+//////////////////////////////////////////////
+//
+//
+//  SearchReadWriteDataByIdentifierFunctions
+//
+//
+//////////////////////////////////////////////
+unsigned char SearchReadWriteDataByIdentifierFunctions(char *data, tstReadWriteDataByIdentifier const *pst)
+{
+    char *ptr,*ptrData = data;
+    unsigned char ucResp = false;
+    
+    ESP_LOGI(SD_TASK_TAG,"\r\nSearchReadWriteDataByIdentifierFunctions\r\n");
+
+    while(pst->ucIndex != 255)
+    {
+    	/*ESP_LOGI(SD_TASK_TAG,"pst->ucIndex:%d\r\n",pst->ucIndex);*/
+        ptr = strstr(ptrData,pst->cIdentifier);
+        if(ptr != NULL)
+        {
+            ptr = strstr(ptrData,pst->cParam1);
+            if(ptr != NULL)
+            {
+            	ptrData +=strlen(pst->cIdentifier);
+				ptrData +=strlen(pst->cParam1);
+				/*ESP_LOGI(SD_TASK_TAG,"cParam1:%s\r\n",pst->cParam1);
+	        	ESP_LOGI(SD_TASK_TAG,"ptrData:%s\r\n",ptrData);*/
+
+				static char cData[128];
+				memset(cData,0,sizeof(cData));
+				ptr = cData;
+				while(*ptrData != '\r')
+				{
+					*ptr = *ptrData;
+					ptr++;
+					ptrData++;
+				}
+				ptrData++;/*"\r"*/
+				ptrData++;/*"\n"*/
+				/*ESP_LOGI(SD_TASK_TAG,"Data:%s\r\n",cData);*/
+				ucResp = pst->ucFuncPtr(cData);
+            }                
+        }
+        pst++;
+
+    }
+    return(ucResp);
+}
+//////////////////////////////////////////////
+//
+//
+//           TaskSd_ReadWriteConfig
+//
+//
+//////////////////////////////////////////////
+unsigned char TaskSd_ReadWriteConfig(sMessageType *psMessage)
+{
+	unsigned char boError = true;
+	tstReadWriteDataByIdentifier const *pst = &astReadWriteTable[0];
+	
+	ESP_LOGI(SD_TASK_TAG,"\r\nTaskSd_ReadWriteConfig=%s\r\n",psMessage->pcMessageData);
+
+	(void)SearchReadWriteDataByIdentifierFunctions(psMessage->pcMessageData, pst);
+
+	return(boError);
+}
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteConfigFile
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteConfigFile(void)
+{
+	unsigned char boError = true;
+	tstConfiguration *pstConfigData = &stConfigData;
+	FILE *f;
+	static char BleDebugMsg[RX_BUF_SIZE];
+	
+	// Use POSIX and C standard library functions to work with files.
+	// First create a file.
+	ESP_LOGI(SD_TASK_TAG, "File will be written");
+	f = fopen("/spiffs/CONFIG.TXT", "w");
+	if (f == NULL) {
+		ESP_LOGE(SD_TASK_TAG, "Failed to open file for writing");
+		return(boError);
+    }
+
+    fwrite(pstConfigData,sizeof(tstConfiguration),1,f);
+    fclose(f);
+	
+	memset(BleDebugMsg,0x00,sizeof(BleDebugMsg));
+	strcpy(BleDebugMsg,"Data Written OK!");
+
+	stSdMsg.ucSrc = SRC_SD;
+	stSdMsg.ucDest = SRC_BLE;
+	stSdMsg.ucEvent = (int)NULL;
+	stSdMsg.pcMessageData = (char*)BleDebugMsg;
+	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
+	
+    memset(&cConfigUartRxBuffer,0x00,RX_BUF_SIZE);
+    ptrRxConfig = &cConfigUartRxBuffer[0];
+
+	return(boError);
+}
+
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteWifiApName
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteWifiApName(char* a)
+{
+	unsigned char boError = true;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\n ucSdWriteWifiApName\r\n");
+
+	memset(stConfigData.cWifiApName,0x00,sizeof(((tstConfiguration){0}).cWifiApName));
+	strcpy(stConfigData.cWifiApName,a);
+
+	ucSdWriteConfigFile();
+
+	/*esp_restart();*/
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteModemApn
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteModemApn(char* a)
+{
+	unsigned char boError = true;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteModemApn\r\n");
+
+	memset(stConfigData.cModemApn,0x00,sizeof(((tstConfiguration){0}).cModemApn));
+	strcpy(stConfigData.cModemApn,a);
+
+	ucSdWriteConfigFile();
+
+
+	/*esp_restart();*/
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteModemApnLogin
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteModemApnLogin(char* a)
+{
+	unsigned char boError = true;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteModemApnLogin:%s\r\n",a);
+
+	memset(stConfigData.cModemApnLogin,0x00,sizeof(((tstConfiguration){0}).cModemApnLogin));
+	strcpy(stConfigData.cModemApnLogin,a);
+
+	ESP_LOGI(SD_TASK_TAG,"\r\n stConfigData.cModemApnLogin:%s\r\n",stConfigData.cModemApnLogin);
+
+	ucSdWriteConfigFile();
+
+
+	/*esp_restart();*/
+    return (boError);
+}
+
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteModemApnPassword
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteModemApnPassword(char* a)
+{
+	unsigned char boError = true;
+	
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteModemApnPassword\r\n");
+
+	memset(stConfigData.cModemApnPassword,0x00,sizeof(stConfigData.cModemApnPassword));
+	strcpy(stConfigData.cModemApnPassword,a);
+	   
+	ucSdWriteConfigFile();
+	
+	/*esp_restart();*/
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteTimeToSleep
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteTimeToSleep(char* a)
+{
+	unsigned char boError = true;
+	unsigned long u32;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteTimeToSleep\r\n");
+
+	u32  = atol(a);
+
+	stConfigData.u32TimeToSleepInSec = u32;
+
+	ucSdWriteConfigFile();
+
+	return (boError);
+}
+
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdAppSource
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdAppSource(char* a)
+{
+	unsigned char boError = true;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdAppSource\r\n");
+
+	memset(stConfigData.cAppSource,0x00,sizeof(stConfigData.cAppSource));
+	strcpy(stConfigData.cAppSource,a);
+
+	ucSdWriteConfigFile();
+
+	/*esp_restart();*/
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWriteWifiApPassword
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteWifiApPassword(char* a)
+{
+	unsigned char boError = true;
+	
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteWifiApPassword\r\n");
+
+	memset(stConfigData.cWifiApPassword,0x00,sizeof(stConfigData.cWifiApPassword));
+	strcpy(stConfigData.cWifiApPassword,a);	
+	   
+	ucSdWriteConfigFile();
+	
+	/*esp_restart();*/
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdWritePeriodLogInSec
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWritePeriodLogInSec(char* a)
+{
+	unsigned char boError = true;
+	unsigned long u32;
+
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWritePeriodLogInSec\r\n");
+
+	u32  = atol(a);
+
+	stConfigData.u32PeriodLogInSec = u32;
+
+	ucSdWriteConfigFile();
+
+    return (boError);
+}
+//////////////////////////////////////////////
+//
+//
+//  	ucSdWriteModemPeriodTxInSec
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdWriteModemPeriodTxInSec(char* a)
+{
+	unsigned char boError = true;
+	unsigned long u32;
+
+	ESP_LOGI(SD_TASK_TAG,"\r\nucSdWriteModemPeriodTxInSec\r\n");
+
+	u32  = atol(a);
+
+	stConfigData.u32ModemPeriodTxInSec = u32;
+
+	ucSdWriteConfigFile();
+
+    return (boError);
+}
+
+//////////////////////////////////////////////
+//
+//
+//  			ucSdDoNothing
+//
+//
+//////////////////////////////////////////////
+unsigned char ucSdDoNothing(char* a)
+{
+	unsigned char boError = true;
+	char *ptr;
+	ptr = a;
+    return (boError);
+}
 
 //////////////////////////////////////////////
 //
@@ -121,6 +475,8 @@ void SdInit(void)
 	/* Create the queue used by the queue send and queue receive tasks.
 	http://www.freertos.org/a00116.html */
 
+    memset(&cConfigUartRxBuffer,0x00,RX_BUF_SIZE);
+    ptrRxConfig = &cConfigUartRxBuffer[0];
 
 	stSdMsg.ucSrc = SRC_SD;
 	stSdMsg.ucDest = SRC_SD;
@@ -139,8 +495,8 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
 {
 	unsigned char boError = true;
 
-	char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);
-	char *pcChar;
+	char* cLocalBuffer = (char*) malloc(sizeof(stConfigData));
+	tstConfiguration *pstConfigData = &stConfigData;
 
     ESP_LOGI(SD_TASK_TAG, "INIT\r\n");
     ESP_LOGI(SD_TASK_TAG, "Initializing SPIFFS");
@@ -189,7 +545,7 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
      *				DELETE FILE
      *********************************************/
 #if 0
-    if (remove("/spiffs/DATA_-100010000.TXT") == 0)
+    if (remove("/spiffs/CONFIG.TXT") == 0)
     	ESP_LOGI(SD_TASK_TAG,"Deleted successfully");
      else
     	 ESP_LOGI(SD_TASK_TAG,"Unable to delete the file");
@@ -220,24 +576,12 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
 #endif
 
     FILE *f;
-
 #if 0
     /*********************************************
      *			WRITING CONFIG FILE
      *********************************************/
-
-    // Use POSIX and C standard library functions to work with files.
-    // First create a file.
-    ESP_LOGI(SD_TASK_TAG, "Opening file");
-    f = fopen("/spiffs/CONFIG.TXT", "w");
-    if (f == NULL) {
-        ESP_LOGE(SD_TASK_TAG, "Failed to open file for writing");
-        return(boError);
-    }
-
-    ESP_LOGI(SD_TASK_TAG, "\r\n%s\r\n",cConfigData);
-    fprintf(f, "%s",cConfigData);
-    fclose(f);
+	boError = ucSdWriteConfigFile();
+	if (boError != true) return(boError);	       
 #endif
 
     /*********************************************
@@ -254,17 +598,10 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
 		return(boError);
     }
 
-    memset(cLocalBuffer,0,RX_BUF_SIZE+1);
-	fread (cLocalBuffer,1,RX_BUF_SIZE,f);
+    memset(cLocalBuffer,0x00,sizeof(tstConfiguration));
+	fread (cLocalBuffer,sizeof(tstConfiguration),1,f);
 	fclose(f);
-	ESP_LOGI(SD_TASK_TAG, "Read from file: '%s'", cLocalBuffer);
 
-	stSdMsg.ucSrc = SRC_SD;
-	stSdMsg.ucDest = SRC_BLE;
-	stSdMsg.ucEvent = (int)NULL;
-	stSdMsg.pcMessageData = &cLocalBuffer[0];
-
-	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
 
 #if 0
     /*********************************************
@@ -274,116 +611,118 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
     esp_vfs_spiffs_unregister(NULL);
     ESP_LOGI(SD_TASK_TAG, "SPIFFS unmounted");
 #endif
+
+	pstConfigData = (tstConfiguration*)(cLocalBuffer);
+
+	/* ConfigFileVersion*/
+	if(strcmp(stConfigData.cConfigFileVersion,pstConfigData->cConfigFileVersion)!=0)
+	{
+		ESP_LOGI(SD_TASK_TAG, "Update Config File!");
+		/*********************************************
+		 *			WRITING CONFIG FILE
+		 *********************************************/
+		boError = ucSdWriteConfigFile();
+		if (boError != true) return(boError);
+
+	    /*********************************************
+	     *			READING CONFIG FILE
+	     *********************************************/
+	    // Open renamed file for reading
+	    ESP_LOGI(SD_TASK_TAG, "Reading Config file");
+	    f = fopen("/spiffs/CONFIG.TXT", "r");
+	    if (f == NULL)
+	    {
+			ESP_LOGE(SD_TASK_TAG, "Failed to open file for reading");
+			boError = false;
+			free(cLocalBuffer);
+			return(boError);
+	    }
+
+	    memset(cLocalBuffer,0x00,sizeof(tstConfiguration));
+		fread (cLocalBuffer,sizeof(tstConfiguration),1,f);
+		fclose(f);
+		pstConfigData = (tstConfiguration*)(cLocalBuffer);
+
+		if(strlen(pstConfigData->cConfigFileVersion))
+		{
+			memset(stConfigData.cConfigFileVersion,0x00,sizeof(stConfigData.cConfigFileVersion));
+			strcpy(stConfigData.cConfigFileVersion,pstConfigData->cConfigFileVersion);
+		}
+	}
+
+
     /* TimeToSleep*/
-	pcChar = strstr (cLocalBuffer,cTimeToSleep);
-	if(pcChar != NULL)
-	{
-		pcChar = pcChar + 3;
-		if(pcChar != NULL)
-		{
-			u32TimeToSleep = atoi(pcChar);
-		}
-	}
-
-
+	stConfigData.u32TimeToSleepInSec = pstConfigData->u32TimeToSleepInSec;	
 	/* Period Log*/
-	pcChar = strstr (cLocalBuffer,cPeriodLog);
-	if(pcChar != NULL)
-	{
-		pcChar = pcChar + 3;
-		if(pcChar != NULL)
-		{
-			u32PeriodLog = atoi(pcChar);
-		}
-	}
-
-
+	stConfigData.u32PeriodLogInSec = pstConfigData->u32PeriodLogInSec;	
     /* Buzzer Status*/
-	pcChar = strstr (cLocalBuffer,cBuzzerStatus);
-	if(pcChar != NULL)
+	if(strlen(pstConfigData->cBuzzerStatus))
 	{
-		pcChar = pcChar + 3;
-		if(pcChar != NULL)
-		{
-			if( (strcmp("ON\r\n",pcChar)) == 0)
-			{
-				boBuzzerStatus = true;
-			}
-			else
-			{
-				boBuzzerStatus = false;
-			}
-		}
+		memset(stConfigData.cBuzzerStatus,0x00,sizeof(stConfigData.cBuzzerStatus));
+		strcpy(stConfigData.cBuzzerStatus,pstConfigData->cBuzzerStatus);	
+	}		
+	/* Wifi ApName*/
+	if(strlen(pstConfigData->cWifiApName))
+	{	
+		memset(stConfigData.cWifiApName,0x00,sizeof(stConfigData.cWifiApName));
+		strcpy(stConfigData.cWifiApName,pstConfigData->cWifiApName);
+	}	
+	/* Wifi Password*/
+	if(strlen(pstConfigData->cWifiApPassword))
+	{	
+		memset(stConfigData.cWifiApPassword,0x00,sizeof(stConfigData.cWifiApPassword));
+		strcpy(stConfigData.cWifiApPassword,pstConfigData->cWifiApPassword);
+	}		
+	/* Http Domain*/
+	if(strlen(pstConfigData->cHttpDomain))
+	{	
+		memset(stConfigData.cHttpDomain,0x00,sizeof(stConfigData.cHttpDomain));
+		strcpy(stConfigData.cHttpDomain,pstConfigData->cHttpDomain);
+	}		
+	/* cPageUrl*/
+	if(strlen(pstConfigData->cPageUrl))
+	{	
+		memset(stConfigData.cPageUrl,0x00,sizeof(stConfigData.cPageUrl));
+		strcpy(stConfigData.cPageUrl,pstConfigData->cPageUrl);
+	}	
+	/* cModemApn*/
+	if(strlen(pstConfigData->cModemApn))
+	{	
+		memset(stConfigData.cModemApn,0x00,sizeof(stConfigData.cModemApn));
+		strcpy(stConfigData.cModemApn,pstConfigData->cModemApn);
+	}
+	/* cModemApnLogin*/
+	if(strlen(pstConfigData->cModemApnLogin))
+	{
+		memset(stConfigData.cModemApnLogin,0x00,sizeof(stConfigData.cModemApnLogin));
+		strcpy(stConfigData.cModemApnLogin,pstConfigData->cModemApnLogin);
+	}
+	/* cModemPassword*/
+	if(strlen(pstConfigData->cModemApnPassword))
+	{	
+		memset(stConfigData.cModemApnPassword,0x00,sizeof(stConfigData.cModemApnPassword));
+		strcpy(stConfigData.cModemApnPassword,pstConfigData->cModemApnPassword);
+	}	
+    /* u32ModemPeriodTxInSec*/
+	stConfigData.u32ModemPeriodTxInSec = pstConfigData->u32ModemPeriodTxInSec;	
+
+
+	/* cAppSource*/
+	if(strlen(pstConfigData->cAppSource))
+	{
+		memset(stConfigData.cAppSource,0x00,sizeof(stConfigData.cAppSource));
+		strcpy(stConfigData.cAppSource,pstConfigData->cAppSource);
 	}
 
-	/*Wifi Settings*/
-	pcChar = strstr (cLocalBuffer,cWifiSettings);
-	if(pcChar != NULL)
-	{
-		pcChar = pcChar + 5;
-		pcChar = strtok((char*)pcChar,",");
-		if(pcChar != NULL)
-		{
-			strcpy(cWifiApName,pcChar);
-		}
-
-		pcChar = strtok(NULL,"\r");
-		if(pcChar != NULL)
-		{
-			strcpy(cWifiApPassword,pcChar);
-		}
-	}
-
-	/*Http Settings*/
-	pcChar = strtok (NULL,"=");
-	pcChar = strtok (NULL,"\r");
-	if(pcChar != NULL)
-	{
-		strcpy(cHttpDns,pcChar);
-
-	}
-
-	/* Page Url*/
-	pcChar = strtok (NULL,"=");
-	pcChar = strtok (NULL,"\r");
-	if(pcChar != NULL)
-	{
-		strcpy(cWebPage,pcChar);
-	}
-
-	/* Modem Settings*/
-	pcChar = strtok (NULL,"=");
-	pcChar = strtok (NULL,",");
-	if(pcChar != NULL)
-	{
-		strcpy(cApn,pcChar);
-	}
-	pcChar = strtok(NULL,",");
-	if(pcChar != NULL)
-	{
-		strcpy(cApnLogin,pcChar);
-	}
-
-	pcChar = strtok(NULL,"\r");
-	if(pcChar != NULL)
-	{
-		strcpy(cApnPassword,pcChar);
-	}
-
-	pcChar = strtok(NULL,"=");
-	pcChar = strtok(NULL,"\r");
-	if(pcChar != NULL)
-	{
-		u32PeriodTx = atoi(pcChar);
-	}
-
-
-    ESP_LOGI(SD_TASK_TAG, "\r\nu32TimeToSleep=%d\r\n",(int)u32TimeToSleep);
-    ESP_LOGI(SD_TASK_TAG, "u32PeriodLog=%d\r\n",(int)u32PeriodLog);
-    ESP_LOGI(SD_TASK_TAG, "WifiAPName=%s\r\nWifiPwd=%s\r\n",cWifiApName,cWifiApPassword);
-    ESP_LOGI(SD_TASK_TAG, "cHttpDns=%s\r\n",cHttpDns);
-    ESP_LOGI(SD_TASK_TAG, "cWebPage=%s\r\n",cWebPage);
-    ESP_LOGI(SD_TASK_TAG, "cApn=%s\r\ncApnLogin=%s\r\ncApnPassword=%s\r\n",cApn,cApnLogin,cApnPassword);
+	ESP_LOGI(SD_TASK_TAG, "\r\ncConfigFileVersion=%s\r\n",stConfigData.cConfigFileVersion);
+    ESP_LOGI(SD_TASK_TAG, "\r\nu32TimeToSleepInSec=%d\r\n",(int)stConfigData.u32TimeToSleepInSec);
+    ESP_LOGI(SD_TASK_TAG, "\r\nu32PeriodLogInSec=%d\r\n",(int)stConfigData.u32PeriodLogInSec);
+    ESP_LOGI(SD_TASK_TAG, "\r\ncBuzzerStatus=%s\r\n",stConfigData.cBuzzerStatus);
+    ESP_LOGI(SD_TASK_TAG, "\r\ncWifiAPName=%s\r\ncWifiPwd=%s\r\n",stConfigData.cWifiApName,stConfigData.cWifiApPassword);
+    ESP_LOGI(SD_TASK_TAG, "\r\ncHttpDomain=%s\r\n",stConfigData.cHttpDomain);
+    ESP_LOGI(SD_TASK_TAG, "\r\ncPageUrl=%s\r\n",stConfigData.cPageUrl);
+    ESP_LOGI(SD_TASK_TAG, "\r\ncApn=%s\r\ncApnLogin=%s\r\ncApnPassword=%s\r\n",stConfigData.cModemApn,stConfigData.cModemApnLogin,stConfigData.cModemApnPassword);
+    ESP_LOGI(SD_TASK_TAG, "\r\nu32ModemPeriodTxInSec=%d\r\n",(int)stConfigData.u32ModemPeriodTxInSec);
 
     free(cLocalBuffer);
 
@@ -409,8 +748,17 @@ unsigned char TaskSd_Opening(sMessageType *psMessage)
 	FILE *f;
 	char* cLocalBuffer = (char*) malloc(RX_BUF_SIZE+1);
 	#if DEBUG_SDCARD
-    ESP_LOGI(SD_TASK_TAG, "<<<<OPENING>>>>\r\n\r\n<<<<>>>>\r\n");
+    ESP_LOGI(SD_TASK_TAG, "<<<<OPENING>>>>\r\n");
 	#endif
+
+    const char BleDebugMsg[] = "SD:OPENING FILE";
+
+    stSdMsg.ucSrc = SRC_SD;
+    stSdMsg.ucDest = SRC_BLE;
+    stSdMsg.ucEvent = (int)NULL;
+    stSdMsg.pcMessageData = (char*)BleDebugMsg;
+	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
+
 
     /*********************************************
      *		READ FILES INSIDE FOLDER
@@ -420,9 +768,8 @@ unsigned char TaskSd_Opening(sMessageType *psMessage)
 
     if ((dir = opendir ("/spiffs/")) != NULL)
     {
-        rewinddir (dir);
-
 		/* print all the files and directories within directory */
+		(void)rewinddir(dir);
 		for(;;)
 		{
 			if((ent = readdir (dir)) != NULL)
@@ -431,42 +778,95 @@ unsigned char TaskSd_Opening(sMessageType *psMessage)
 
 				if(strstr(ent->d_name,"DATA_") != NULL)
 				{
-					memset(cLocalBuffer,0,RX_BUF_SIZE+1);
+					if(strstr(ent->d_name,".TXT") != NULL)
+					{
+						memset(cLocalBuffer,0,RX_BUF_SIZE+1);
 
-					strcpy(cLocalBuffer,"/spiffs/");
-					strcat(cLocalBuffer,ent->d_name);
+						strcpy(cLocalBuffer,"/spiffs/");
+						strcat(cLocalBuffer,ent->d_name);
+						f = fopen((const char*)cLocalBuffer, "r");
+						if(f == NULL )
+						{
+							ESP_LOGE(SD_TASK_TAG, "Failed to open file for reading");
+							boError = false;
+						}
+						else
+						{
+							fclose(f);
+							strcpy(szFilenameToBeRead,cLocalBuffer);
 
-					f = fopen((const char*)cLocalBuffer, "r");
-				    if(f == NULL )
-				    {
-						ESP_LOGE(SD_TASK_TAG, "Failed to open file for reading");
-						boError = false;
-				    }
-				    else
-				    {
-					    fclose(f);
-						strcpy(szFilenameToBeRead,cLocalBuffer);
+							liFilePointerPositionBeforeReading = 0;
+							liFilePointerPositionAfterReading = 0;
 
-						liFilePointerPositionBeforeReading = 0;
-						liFilePointerPositionAfterReading = 0;
+							stSdMsg.ucSrc = SRC_SD;
+							stSdMsg.ucDest = SRC_SD;
+							stSdMsg.ucEvent = EVENT_SD_READING;
+							xQueueSend( xQueueSd, ( void * )&stSdMsg, 0);
+						}
+						break;
+					}
+					else/*File does not end with .TXT*/
+					{
+						#if DEBUG_SDCARD
+						ESP_LOGE(SD_TASK_TAG, "Trying to remove file");
+						#endif
 
-						stSdMsg.ucSrc = SRC_SD;
-						stSdMsg.ucDest = SRC_SD;
-						stSdMsg.ucEvent = EVENT_SD_READING;
-						xQueueSend( xQueueSd, ( void * )&stSdMsg, 0);
-				    }
-					break;
+						memset(cLocalBuffer,0,RX_BUF_SIZE+1);
+
+						strcpy(cLocalBuffer,"/spiffs/");
+						strcat(cLocalBuffer,ent->d_name);
+
+						int ret = remove(cLocalBuffer);
+
+						if(ret == 0)
+						{
+							#if DEBUG_SDCARD
+							ESP_LOGE(SD_TASK_TAG, "File deleted successfully");
+							#endif
+						 }
+					}
+				}
+				else
+				{
+					if(strstr(ent->d_name,"CONFIG") == NULL)
+					{
+						memset(cLocalBuffer,0,RX_BUF_SIZE+1);
+
+						strcpy(cLocalBuffer,"/spiffs/");
+						strcat(cLocalBuffer,ent->d_name);
+
+						#if DEBUG_SDCARD
+						ESP_LOGE(SD_TASK_TAG, "Trying to remove file:%s",cLocalBuffer);
+						#endif
+
+						int ret = remove(cLocalBuffer);
+
+						if(ret == 0)
+						{
+							#if DEBUG_SDCARD
+							ESP_LOGE(SD_TASK_TAG, "File deleted successfully");
+							#endif
+						 }
+					}
 				}
 			}
 			else
 			{
 				ESP_LOGE(SD_TASK_TAG,"No more DATA files\n");
 		        boError = false;
-
+#if SRC_GSM
 				stSdMsg.ucSrc = SRC_SD;
 				stSdMsg.ucDest = SRC_GSM;
 				stSdMsg.ucEvent = EVENT_GSM_ENDING;
 				xQueueSend( xQueueGsm, ( void * )&stSdMsg, 0);
+#endif
+
+#if SRC_HTTPCLI
+				stSdMsg.ucSrc = SRC_SD;
+				stSdMsg.ucDest = SRC_HTTPCLI;
+				stSdMsg.ucEvent = EVENT_HTTPCLI_ENDING;
+				xQueueSend( xQueueHttpCli, ( void * )&stSdMsg, 0);
+#endif
 
 				break;
 			}
@@ -499,6 +899,14 @@ unsigned char TaskSd_Writing(sMessageType *psMessage)
 #if DEBUG_SDCARD
     ESP_LOGI(SD_TASK_TAG, "<<<<WRITING>>>>\r\n%s\r\n<<<<>>>>\r\n",szFilenameToBeWritten);
 #endif
+
+    const char BleDebugMsg[] = "SD:WRITING FILE";
+
+    stSdMsg.ucSrc = SRC_SD;
+    stSdMsg.ucDest = SRC_BLE;
+    stSdMsg.ucEvent = (int)NULL;
+    stSdMsg.pcMessageData = (char*)BleDebugMsg;
+	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
 
 
 #if 0
@@ -594,6 +1002,13 @@ unsigned char TaskSd_Reading(sMessageType *psMessage)
 	ESP_LOGI(SD_TASK_TAG, "<<<<READING>>>>\r\n%s\r\n<<<<>>>>\r\n",szFilenameToBeRead);
 #endif
 
+    const char BleDebugMsg[] = "SD:READING FILE";
+
+    stSdMsg.ucSrc = SRC_SD;
+    stSdMsg.ucDest = SRC_BLE;
+    stSdMsg.ucEvent = (int)NULL;
+    stSdMsg.pcMessageData = (char*)BleDebugMsg;
+	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
 
 	f = fopen(szFilenameToBeRead, "r");
 	if(f != NULL)
@@ -626,28 +1041,33 @@ unsigned char TaskSd_Reading(sMessageType *psMessage)
 
 				ESP_LOGI(SD_TASK_TAG, "Content of file with %d Bytes: %s",i, cLocalBuffer);
 				/* Verify if file is OK*/
-				if((cLocalBuffer[0] == 'S') && (cLocalBuffer[1] == '=') && (cLocalBuffer[i-1] == '\n') && (cLocalBuffer[i-2] == '\r'))
+				if((cLocalBuffer[0] == 'S') && (cLocalBuffer[1] == '=') && (cLocalBuffer[i-2] == '\r') && (cLocalBuffer[i-1] == '\n'))
 				{
 					memset(cConfigAndData,0,RX_BUF_SIZE+1);
 					strncpy(cConfigAndData,cLocalBuffer,i-2);
 
-					if(ucCurrentStateGsm == TASKGSM_COMMUNICATING)
-					{
+
+
+#if SRC_GSM
+					//if(ucCurrentStateGsm == TASKGSM_COMMUNICATING)
+					//{
 						stSdMsg.ucSrc = SRC_SD;
 						stSdMsg.ucDest = SRC_GSM;
 						stSdMsg.ucEvent = EVENT_GSM_SEND_HTTPURL/*EVENT_GSM_SEND_HTTPPREPAREDATA*//*EVENT_GSM_SEND_HTTPPREPAREDATA*//*EVENT_GSM_SEND_START*//*EVENT_GSM_SEND_CIPSEND*//*EVENT_GSM_SEND_DATA*/;
 						stSdMsg.pcMessageData = "";
 						xQueueSend( xQueueGsm, ( void * )&stSdMsg, 0);
-					}
-					else
-					{
+					//}
+#endif
+#if SRC_HTTPCLI
+					//else
+					//{
 						stSdMsg.ucSrc = SRC_SD;
 						stSdMsg.ucDest = SRC_HTTPCLI;
 						stSdMsg.ucEvent = EVENT_HTTPCLI_POST;
 						stSdMsg.pcMessageData = "";
 						xQueueSend( xQueueHttpCli, ( void * )&stSdMsg, 0);
-					}
-
+					//}
+#endif
 					fclose(f);
 					break;
 				}
@@ -666,36 +1086,39 @@ unsigned char TaskSd_Reading(sMessageType *psMessage)
 				if(feof(f))
 				{
 					ESP_LOGI(SD_TASK_TAG, "End of File");
-
-
-					int ret = remove(szFilenameToBeRead);
-
-					if(ret == 0)
-					{
-						#if DEBUG_SDCARD
-						ESP_LOGE(SD_TASK_TAG, "File deleted successfully");
-						#endif
-					 }
-					else
-					{
-						#if DEBUG_SDCARD
-						ESP_LOGE(SD_TASK_TAG, "Error: unable to delete the file");
-						#endif
-					}
-
-					stSdMsg.ucSrc = SRC_SD;
-					stSdMsg.ucDest = SRC_GSM;
-					stSdMsg.ucEvent = EVENT_GSM_ENDING/*EVENT_GSM_LIST_SMS_MSG*/;
-					xQueueSend( xQueueGsm, ( void * )&stSdMsg, 0);
-
-					stSdMsg.ucSrc = SRC_SD;
-					stSdMsg.ucDest = SRC_HTTPCLI;
-					stSdMsg.ucEvent = EVENT_HTTPCLI_ENDING/*EVENT_GSM_LIST_SMS_MSG*/;
-					xQueueSend( xQueueHttpCli, ( void * )&stSdMsg, 0);
-
-
-
 				}
+				else
+				{
+					ESP_LOGI(SD_TASK_TAG, "File has not been deleted before, delete now!");
+				}
+
+				int ret = remove(szFilenameToBeRead);
+
+				if(ret == 0)
+				{
+					#if DEBUG_SDCARD
+					ESP_LOGE(SD_TASK_TAG, "File deleted successfully");
+					#endif
+				 }
+				else
+				{
+					#if DEBUG_SDCARD
+					ESP_LOGE(SD_TASK_TAG, "Error: unable to delete the file");
+					#endif
+				}
+#if SRC_GSM
+				stSdMsg.ucSrc = SRC_SD;
+				stSdMsg.ucDest = SRC_GSM;
+				stSdMsg.ucEvent = EVENT_GSM_ENDING/*EVENT_GSM_LIST_SMS_MSG*/;
+				xQueueSend( xQueueGsm, ( void * )&stSdMsg, 0);
+#endif
+
+#if SRC_HTTPCLI
+				stSdMsg.ucSrc = SRC_SD;
+				stSdMsg.ucDest = SRC_HTTPCLI;
+				stSdMsg.ucEvent = EVENT_HTTPCLI_ENDING/*EVENT_GSM_LIST_SMS_MSG*/;
+				xQueueSend( xQueueHttpCli, ( void * )&stSdMsg, 0);
+#endif
 
 				fclose(f);
 				break;
@@ -707,11 +1130,19 @@ unsigned char TaskSd_Reading(sMessageType *psMessage)
 		#if DEBUG_SDCARD
 			ESP_LOGE(SD_TASK_TAG, "No more files...");
 		#endif
-
+#if SRC_GSM
 		stSdMsg.ucSrc = SRC_SD;
 		stSdMsg.ucDest = SRC_GSM;
 		stSdMsg.ucEvent = EVENT_GSM_ENDING/*EVENT_GSM_LIST_SMS_MSG*/;
 		xQueueSend( xQueueGsm, ( void * )&stSdMsg, 0);
+#endif
+
+#if SRC_HTTPCLI
+		stSdMsg.ucSrc = SRC_SD;
+		stSdMsg.ucDest = SRC_HTTPCLI;
+		stSdMsg.ucEvent = EVENT_HTTPCLI_ENDING;
+		xQueueSend( xQueueHttpCli, ( void * )&stSdMsg, 0);
+#endif
 
 		stSdMsg.ucSrc = SRC_SD;
 		stSdMsg.ucDest = SRC_SD;
@@ -740,6 +1171,14 @@ unsigned char TaskSd_Marking(sMessageType *psMessage)
 #if DEBUG_SDCARD
 	ESP_LOGI(SD_TASK_TAG, "<<<<MARKING>>>>\r\n");
 #endif
+
+    const char BleDebugMsg[] = "SD:MARKING FILE";
+
+    stSdMsg.ucSrc = SRC_SD;
+    stSdMsg.ucDest = SRC_BLE;
+    stSdMsg.ucEvent = (int)NULL;
+    stSdMsg.pcMessageData = (char*)BleDebugMsg;
+	xQueueSend(xQueueBle,( void * )&stSdMsg,NULL);
 
 	if((f = fopen(szFilenameToBeRead, "r+")) != NULL)
 	{
@@ -782,6 +1221,7 @@ static sStateMachineType const gasTaskSd_Initializing[] =
 		{EVENT_SD_WRITING, 					TaskSd_Writing,	    	 	TASKSD_INITIALIZING,		TASKSD_INITIALIZING	},
 		{EVENT_SD_READING, 					TaskSd_Reading,				TASKSD_INITIALIZING,		TASKSD_INITIALIZING	},
 	   	{EVENT_SD_MARKING, 					TaskSd_Marking,				TASKSD_INITIALIZING,		TASKSD_INITIALIZING },
+	   	{EVENT_SD_READWRITE_CONFIG,			TaskSd_ReadWriteConfig,		TASKSD_INITIALIZING,		TASKSD_INITIALIZING },		
 	    {EVENT_SD_NULL,                     TaskSd_IgnoreEvent,			TASKSD_INITIALIZING,		TASKSD_INITIALIZING }
 };
 
@@ -794,17 +1234,39 @@ static unsigned char ucCurrentStateSd = TASKSD_INITIALIZING;
 
 void vTaskSd( void *pvParameters )
 {
+	TickType_t elapsed_time;
+
+    uint8_t * spp_cmd_buff = NULL;
+    spp_cmd_buff = (uint8_t *)malloc((128) * sizeof(uint8_t));
 
 	for( ;; )
 	{
 	    /*ESP_LOGI(SD_TASK_TAG, "Running...");*/
+		elapsed_time = xTaskGetTickCount();
 
 		if( xQueueReceive( xQueueSd, &( stSdMsg ),0 ) )
 		{
             (void)eEventHandler ((unsigned char)SRC_SD,gpasTaskSd_StateMachine[ucCurrentStateSd], &ucCurrentStateSd, &stSdMsg);
 		}
 
-		vTaskDelay(500/portTICK_PERIOD_MS);
+		if(strlen(cConfigUartRxBuffer) > 0)
+		{
+			ESP_LOGI(SD_TASK_TAG, "%s\r\n",cConfigUartRxBuffer);
+
+			if(strstr((const char*)cConfigUartRxBuffer,"$CONF:") != NULL)
+        	{
+                ESP_LOGI(SD_TASK_TAG, "$CONF:\r\n");
+				/* Receive data over BT and pass it over to SD*/
+				stSdMsg.ucSrc = SRC_SD;
+				stSdMsg.ucDest = SRC_SD;
+				stSdMsg.ucEvent = EVENT_SD_READWRITE_CONFIG;
+				stSdMsg.pcMessageData = (char*)cConfigUartRxBuffer;
+
+				xQueueSend( xQueueSd, ( void * )&stSdMsg, NULL);
+        	}
+		}
+
+		vTaskDelayUntil(&elapsed_time, 1000 / portTICK_PERIOD_MS);
 	}
 
 

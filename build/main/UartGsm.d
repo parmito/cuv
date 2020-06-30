@@ -64,6 +64,8 @@ UartGsm.o: \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h \
  /home/danilo/esp/esp-idf/components/esp_ringbuf/include/freertos/ringbuf.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/can.h \
+ /home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/time.h
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
@@ -193,6 +195,10 @@ UartGsm.o: \
 /home/danilo/esp/esp-idf/components/esp_ringbuf/include/freertos/ringbuf.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/defines.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/can.h:
+
+/home/danilo/esp/esp-idf/components/driver/include/driver/gpio.h:
 
 /home/danilo/esp/esp-idf/components/newlib/platform_include/time.h:
 /home/danilo/esp/esp-idf/examples/get-started/cuv/main/./UartGsm.c:
