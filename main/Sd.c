@@ -593,9 +593,15 @@ unsigned char TaskSd_Init(sMessageType *psMessage)
     if (f == NULL)
     {
 		ESP_LOGE(SD_TASK_TAG, "Failed to open file for reading");
-		boError = false;
+		/*boError = false;
 		free(cLocalBuffer);
-		return(boError);
+		return(boError);*/
+
+	    /*********************************************
+	     *			WRITING CONFIG FILE
+	     *********************************************/
+		boError = ucSdWriteConfigFile();
+		if (boError != true) return(boError);
     }
 
     memset(cLocalBuffer,0x00,sizeof(tstConfiguration));

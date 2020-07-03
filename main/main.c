@@ -142,10 +142,10 @@ void app_main()
             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
     /* Uart Gsm initialization*/
-    UartGsminit();
+    /*UartGsminit();*/
 
     /* Uart Gps initialization*/
-    UartGpsinit();
+    /*UartGpsinit();*/
 
     /* Uart Config initialization*/
     UartConfiginit();
@@ -182,13 +182,13 @@ void app_main()
     DebugInit();
 
     /* Gps initialization*/
-    GpsInit();
+    /*GpsInit();*/
 
     /*Http Client*/
     Http_Init();
 
     /* Gsm initialization*/
-    GsmInit();
+    /*GsmInit();*/
 
     /* RemoteReceiver initialization*/
     /*RemoteReceiverInit();*/
