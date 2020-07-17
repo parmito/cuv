@@ -174,7 +174,7 @@ static const char *IO_TASK_TAG = "IO_TASK";
 static const adc_channel_t channel = ADC_CHANNEL_3;     /*GPIO39 if ADC1*/
 static const adc_atten_t atten = ADC_ATTEN_DB_11;
 /*static const adc_unit_t unit = ADC_UNIT_1;*/
-
+TickType_t Elapsed_Time1,Elapsed_Time2,Elapsed_Time3;
 unsigned char ucCurrentStateIo = TASKIO_IDLING;
 
 tstCanMessage	stCanMessage0ms[1]={
@@ -947,9 +947,16 @@ unsigned char TaskIo_ReadIo(void)
 {
 	unsigned char boError = true;
 	static unsigned char ucCurrIgnition = 0xFF;
-	static unsigned long u32EnterSleepMode = (120*(1000/TASK_PERIOD));
+	static long i32EnterSleepMode = (120*(1000 / portTICK_PERIOD_MS));
+	static unsigned long u32CurrentTime,u32PreviousTime = 0xFFFFFFFF,u32DeltaTime;
+
     uint32_t adc_reading = 0;
     static char cLocalBuffer[64];
+
+	#if DEBUG_IO
+	ESP_LOGI(IO_TASK_TAG,"TaskIo_ReadIo\r\n");
+	#endif
+
 
     /* Multisampling */
     for (int i = 0; i < NO_OF_SAMPLES; i++)
@@ -1076,7 +1083,7 @@ unsigned char TaskIo_ReadIo(void)
 	if(gpio_get_level(GPIO_INPUT_IGNITION) == 1)
 	{
 		stIo.ucIgnition = 1;
-		u32EnterSleepMode = (120*(1000/TASK_PERIOD));/*(u32TimeToSleep);*/
+		i32EnterSleepMode = (120*(1000/TASK_PERIOD));/*(u32TimeToSleep);*/
 
 		uint8_t u8Status = 0;
 		uint8_t u8Index = 0;
@@ -1087,7 +1094,7 @@ unsigned char TaskIo_ReadIo(void)
 			stCanMessage100ms[u8Index].stCan.data[2] = 0x03;
 		}
 		#if DEBUG_IO
-		/*ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");*/
+		ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");
 		#endif
 
 		if(ucCurrIgnition != stIo.ucIgnition)
@@ -1097,7 +1104,7 @@ unsigned char TaskIo_ReadIo(void)
 			#endif
 
 			#if DEBUG_IO
-			/*ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");*/
+			ESP_LOGI(IO_TASK_TAG,"Ignition ON\r\n");
 			#endif
 			ucCurrIgnition = stIo.ucIgnition;
 		}
@@ -1114,32 +1121,38 @@ unsigned char TaskIo_ReadIo(void)
 			stCanMessage100ms[u8Index].stCan.data[2] = 0;
 		}
 
-
-
-
 		#if DEBUG_IO
-		/*ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");*/
+		ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");
 		#endif
+
+		u32CurrentTime = (unsigned long)(xTaskGetTickCount());
+		ESP_LOGI(IO_TASK_TAG,"u32CurrentTime=%ld\r\n",u32CurrentTime);
+		if(u32PreviousTime != 0xFFFFFFFF){
+			u32DeltaTime = u32CurrentTime - u32PreviousTime;
+			u32PreviousTime = u32CurrentTime;
+		}else{
+			u32PreviousTime = u32CurrentTime;
+		}
+		ESP_LOGI(IO_TASK_TAG,"ElapsedTime=%ld\r\n",u32DeltaTime);
 
 		if(ucCurrIgnition != stIo.ucIgnition)
 		{
 			#if DEBUG_IO
-			/*ESP_LOGI(IO_TASK_TAG,"Status=%d,Index=%d\r\n",u8Status,u8Index);*/
+			ESP_LOGI(IO_TASK_TAG,"Status=%d,Index=%d\r\n",u8Status,u8Index);
 			#endif
 
 			#if DEBUG_IO
-			/*ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");*/
+			ESP_LOGI(IO_TASK_TAG,"Ignition OFF\r\n");
 			#endif
 			ucCurrIgnition = stIo.ucIgnition;
 		}
 
-		if(u32EnterSleepMode > 0)
+		if(i32EnterSleepMode > 0)
 		{
+			i32EnterSleepMode-= u32DeltaTime;
 			#if DEBUG_IO
-			/*ESP_LOGI(IO_TASK_TAG,"Sleep=%d\r\n",(int)u32EnterSleepMode);*/
+			ESP_LOGI(IO_TASK_TAG,"Sleep=%d\r\n",(int)i32EnterSleepMode);
 			#endif
-
-			u32EnterSleepMode--;
 		}
 		else
 		{
@@ -1624,7 +1637,7 @@ unsigned char TaskIo_AddCanMessage(sMessageType *psMessage)
 //////////////////////////////////////////////
 void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
 {
-	#if DEBUG_IO
+	#if 0
 	ESP_LOGI(IO_TASK_TAG,"IO:TX EVENT CAN MESSAGE\r\n");
 	#endif
 
@@ -1677,7 +1690,7 @@ void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
 //////////////////////////////////////////////
 void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 {
-	#if DEBUG_IO
+	#if 1
 	ESP_LOGI(IO_TASK_TAG,"IO:TX GENERIC CAN MESSAGE\r\n");
 	#endif
 
@@ -1686,19 +1699,19 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 	{
 		if(stCanMessage[i].stCan.identifier != 0)
 		{
-			#if DEBUG_IO
+			#if 1
 			ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
 			ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);
 			#endif
 			if (can_transmit(&stCanMessage[i].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
-				#if DEBUG_IO
+				#if 1
 				ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[i].stCan.identifier);
 				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
 				#endif
 
-				#if DEBUG_IO
+				#if 1
 				for (unsigned int u16 = 0; u16 < stCanMessage[i].stCan.data_length_code; u16++)
 				{
 					ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[i].stCan.data[u16]);
@@ -1708,7 +1721,7 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 			else
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
-				#if DEBUG_IO
+				#if 1
 				ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[i].stCan.identifier);
 				#endif
 
@@ -1793,13 +1806,12 @@ static sStateMachineType const * const gpasTaskIo_StateMachine[] =
 
 void vTaskIo( void *pvParameters )
 {
-	TickType_t elapsed_time;
+
 	static unsigned long u32Timeout = 0;
 	for( ;; )
 	{
-		elapsed_time = xTaskGetTickCount();
+		Elapsed_Time1 = xTaskGetTickCount();
 		TaskIo_ReadIo();
-				
 		TaskIo_TransmitEventCanMessage(stCanMessage0ms);
 
 		if(u32Timeout % 20 == 0)
@@ -1841,7 +1853,8 @@ void vTaskIo( void *pvParameters )
 		}
 		u32Timeout += TASK_PERIOD;
 
-		vTaskDelayUntil(&elapsed_time, TASK_PERIOD / portTICK_PERIOD_MS);
+		vTaskDelayUntil(&Elapsed_Time1, TASK_PERIOD / portTICK_PERIOD_MS);
+
 	}
 }
 

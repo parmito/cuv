@@ -91,7 +91,9 @@ static const char *DEBUG_TASK_TAG = "DEBUG_TASK";
 //////////////////////////////////////////////
 void Debug_Io_Configuration(void)
 {
-#if 0
+
+
+#if 1
 	/////////////////
 	// GSM DIAG PIN
 	/////////////////
@@ -109,6 +111,9 @@ void Debug_Io_Configuration(void)
 	//configure GPIO with the given settings
 	gpio_config(&io_conf);
 #endif
+
+
+
 #if 0
 	int ch;
 	/*
@@ -203,6 +208,7 @@ void Debug_Io_Configuration(void)
 //////////////////////////////////////////////
 void DebugInit(void)
 {
+	ESP_LOGI(DEBUG_TASK_TAG, "DebugInit\r\n");
 	/*esp_log_level_set(DEBUG_TASK_TAG, ESP_LOG_INFO);*/
 #if 0
     xQueueDebug = xQueueCreate(sdQUEUE_LENGTH,			/* The number of items the queue can hold. */
@@ -233,6 +239,7 @@ unsigned char TaskDebug_Gsm_Init(sMessageType *psMessage)
     uint32_t u32FreqHz = 1;
 	int ch;
 
+	ESP_LOGI(DEBUG_TASK_TAG, "TaskDebug_Gsm_Init\r\n");
 	/*
 	 * Prepare and set configuration of timers
 	 * that will be used by LED Controller

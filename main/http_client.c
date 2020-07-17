@@ -462,11 +462,11 @@ unsigned char TaskHttpCli_Connecting(sMessageType *psMessage)
     esp_wifi_connect();
     app_wifi_wait_connected();
 
-	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+/*	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_CONNECTING;
 	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
-
+*/
 
 	sprintf(cLocalBuffer,"HTTP CONNECTING\r\n");
 
@@ -530,10 +530,10 @@ unsigned char TaskHttpCli_Post(sMessageType *psMessage)
 
     http_post(cConfigAndData);
 
-	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	/*stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_COMMUNICATING;
-	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);*/
 
 	sprintf(cLocalBuffer,"HTTP POSTING\r\n");
 
@@ -566,10 +566,10 @@ unsigned char TaskHttpCli_Posted(sMessageType *psMessage)
 	stHttpCliMsg.ucEvent = EVENT_SD_MARKING;
 	xQueueSend( xQueueSd, ( void * )&stHttpCliMsg, 0);
 
-	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	/*stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_UPLOAD_DONE;
-	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);*/
 
 	memset(cLocalBuffer,0,sizeof(cLocalBuffer));
 	sprintf(cLocalBuffer,"HTTP POSTED\r\n");
@@ -646,10 +646,10 @@ unsigned char TaskHttpCli_Ending(sMessageType *psMessage)
 	xQueueSend(xQueueBle,( void * )&stHttpCliMsg,NULL);
 
 
-	stHttpCliMsg.ucSrc = SRC_HTTPCLI;
+	/*stHttpCliMsg.ucSrc = SRC_HTTPCLI;
 	stHttpCliMsg.ucDest = SRC_DEBUG;
 	stHttpCliMsg.ucEvent = EVENT_IO_GSM_INIT;
-	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);
+	xQueueSend( xQueueDebug, ( void * )&stHttpCliMsg, 0);*/
 
 	return(boError);
 }
