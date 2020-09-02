@@ -177,10 +177,11 @@ static const adc_atten_t atten = ADC_ATTEN_DB_11;
 TickType_t Elapsed_Time1,Elapsed_Time2,Elapsed_Time3;
 unsigned char ucCurrentStateIo = TASKIO_IDLING;
 
-tstCanMessage	stCanMessage0ms[1]={
+tstCanMessage	stCanMessage0ms[3]={
 
-{.u32Timeout = 0,.u32Period = 0,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}}
-
+{.u32Timeout = 0,.u32Period = 0,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0x31,0x31,0x31,0x31,0x31,0x31,0x31,0x31}},
+{.u32Timeout = 0,.u32Period = 0,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0x31,0x31,0x31,0x31,0x31,0x31,0x31,0x31}},
+{.u32Timeout = 0,.u32Period = 0,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0x31,0x31,0x31,0x31,0x31,0x31,0x31,0x31}}
 };
 
 tstCanMessage	stCanMessage20ms[SIZE_OF_STRUCT]=
@@ -445,10 +446,11 @@ tstCanMessage	stCanMessage200ms[SIZE_OF_STRUCT]=
 	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_EXTD,.stCan.identifier=0x1B00006F,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},
 	/*NMH_Gateway	0x1B000010	452984848	Classical	8	200*/
 	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_EXTD,.stCan.identifier=0x1B000010,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},				
-	/*VIN_01	0x6B4	1716	Classical	8	200*/
-	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x06B4,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},					
 	/*WFS_01	0x551	1361	Classical	8	200*/
-	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0551,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},						
+	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0551,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},
+	/*VIN_01	0x6B4	1716	Classical	8	200 - REMOVIDO*/
+	/*{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x06B4,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},*/
+	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},
 	/*Reserved*/
 	{.u32Timeout = 0,.u32Period = 200,.stCan.flags=CAN_MSG_FLAG_NONE,.stCan.identifier=0x0000,.stCan.data_length_code=8,.stCan.data={0,0,0,0,0,0,0,0}},				
 	/*Reserved*/
@@ -1126,14 +1128,18 @@ unsigned char TaskIo_ReadIo(void)
 		#endif
 
 		u32CurrentTime = (unsigned long)(xTaskGetTickCount());
+		#if DEBUG_IO
 		ESP_LOGI(IO_TASK_TAG,"u32CurrentTime=%ld\r\n",u32CurrentTime);
+		#endif
 		if(u32PreviousTime != 0xFFFFFFFF){
 			u32DeltaTime = u32CurrentTime - u32PreviousTime;
 			u32PreviousTime = u32CurrentTime;
 		}else{
 			u32PreviousTime = u32CurrentTime;
 		}
+		#if DEBUG_IO
 		ESP_LOGI(IO_TASK_TAG,"ElapsedTime=%ld\r\n",u32DeltaTime);
+		#endif
 
 		if(ucCurrIgnition != stIo.ucIgnition)
 		{
@@ -1159,7 +1165,6 @@ unsigned char TaskIo_ReadIo(void)
 			Io_Sleeping();
 		}
 	}
-
 
 	return(boError);
 }
@@ -1631,53 +1636,114 @@ unsigned char TaskIo_AddCanMessage(sMessageType *psMessage)
 //////////////////////////////////////////////
 //
 //
-//     TaskIo_TransmitEventCanMessage
+//     TaskIo_TransmitCustomCanMessage
 //
 //
 //////////////////////////////////////////////
-void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
+static unsigned char ucCustomCANMsg = false;
+void TaskIo_TransmitCustomCanMessage(tstCanMessage *pst,unsigned char ucSize)
 {
+	#if DEBUG_IO
+	ESP_LOGI(IO_TASK_TAG,"TaskIo_TransmitCustomCanMessage\r\n");
+	#endif
+
+	/*tstCanMessage *pst = stCanMessage0ms;*/
+	/*unsigned char ucSize = sizeof stCanMessage0ms / sizeof stCanMessage0ms[0];*/
+
+
+	for(unsigned char i = 0; i <ucSize; i++)
+	{
+		/*Check whether can message exists*/
+		if(pst[i].stCan.identifier != 0)
+		{
+			if (can_transmit(&pst[i].stCan, pdMS_TO_TICKS(10)) == ESP_OK)
+			{
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+				#if DEBUG_IO
+				ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",pst[i].stCan.identifier);
+				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
+				#endif
+
+				#if DEBUG_IO
+				for (unsigned int u16 = 0; u16 < pst[i].stCan.data_length_code; u16++)
+				{
+					ESP_LOGI(IO_TASK_TAG,"0x%02X ",pst[i].stCan.data[u16]);
+				}
+				#endif
+			}
+			else
+			{
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
+				#if DEBUG_IO
+				ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",pst[i].stCan.identifier);
+				#endif
+
+				can_clear_transmit_queue();
+				can_clear_receive_queue();
+				can_stop();
+				can_initiate_recovery();
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+				can_start();
+			}
+		}
+	}
+}
+
+unsigned char TaskIo_TransmitEventCanMessage(sMessageType *psMessage)
+{
+	unsigned char boError = true;
+
+	ucCustomCANMsg = true;
+#if 0
 	#if 0
 	ESP_LOGI(IO_TASK_TAG,"IO:TX EVENT CAN MESSAGE\r\n");
 	#endif
 
-	/*Check whether can message exists*/
-	if(stCanMessage[0].stCan.identifier != 0)
+	tstCanMessage *pst = stCanMessage0ms;
+
+	unsigned char ucSize = sizeof stCanMessage0ms / sizeof stCanMessage0ms[0];
+
+	for(unsigned char i = 0; i <ucSize; i++)
 	{
-		#if DEBUG_IO
-		/*ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);*/
-		ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[01].u32Period);
-		#endif
-		if (can_transmit(&stCanMessage[0].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
+		/*Check whether can message exists*/
+		if(pst[i].stCan.identifier != 0)
 		{
-			gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
 			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[0].stCan.identifier);
-			ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
+			ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)(pst[i].u32Period));
 			#endif
-
-			#if DEBUG_IO
-			for (unsigned int u16 = 0; u16 < stCanMessage[0].stCan.data_length_code; u16++)
+			if (can_transmit(&pst[i].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
 			{
-				ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[0].stCan.data[u16]);
-			}
-			#endif
-		}
-		else
-		{
-			gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
-			#if DEBUG_IO
-			ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[0].stCan.identifier);
-			#endif
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+				#if DEBUG_IO
+				ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",pst[i].stCan.identifier);
+				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
+				#endif
 
-			can_clear_transmit_queue();
-			can_clear_receive_queue();
-			can_stop();
-			can_initiate_recovery();
-			gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
-			can_start();
+				#if DEBUG_IO
+				for (unsigned int u16 = 0; u16 < pst[i].stCan.data_length_code; u16++)
+				{
+					ESP_LOGI(IO_TASK_TAG,"0x%02X ",pst[i].stCan.data[u16]);
+				}
+				#endif
+			}
+			else
+			{
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
+				#if DEBUG_IO
+				ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",pst[i].stCan.identifier);
+				#endif
+
+				can_clear_transmit_queue();
+				can_clear_receive_queue();
+				can_stop();
+				can_initiate_recovery();
+				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
+				can_start();
+			}
 		}
 	}
+#endif
+	return(boError);
 }
 
 
@@ -1690,7 +1756,7 @@ void TaskIo_TransmitEventCanMessage(tstCanMessage stCanMessage[1])
 //////////////////////////////////////////////
 void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 {
-	#if 1
+	#if DEBUG_IO
 	ESP_LOGI(IO_TASK_TAG,"IO:TX GENERIC CAN MESSAGE\r\n");
 	#endif
 
@@ -1699,19 +1765,19 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 	{
 		if(stCanMessage[i].stCan.identifier != 0)
 		{
-			#if 1
+			#if DEBUG_IO
 			ESP_LOGI(IO_TASK_TAG,"CAN INDEX:%d\r\n",i);
 			ESP_LOGI(IO_TASK_TAG,"CAN PERIOD:%d\r\n",(int)stCanMessage[i].u32Period);
 			#endif
-			if (can_transmit(&stCanMessage[i].stCan, pdMS_TO_TICKS(1)) == ESP_OK)
+			if (can_transmit(&stCanMessage[i].stCan, pdMS_TO_TICKS(10)) == ESP_OK)
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 0);
-				#if 1
+				#if DEBUG_IO
 				ESP_LOGI(IO_TASK_TAG,"CAN TX ID:0x%04X\r\n",stCanMessage[i].stCan.identifier);
 				ESP_LOGI(IO_TASK_TAG,"CAN TX DATA:");
 				#endif
 
-				#if 1
+				#if DEBUG_IO
 				for (unsigned int u16 = 0; u16 < stCanMessage[i].stCan.data_length_code; u16++)
 				{
 					ESP_LOGI(IO_TASK_TAG,"0x%02X ",stCanMessage[i].stCan.data[u16]);
@@ -1721,7 +1787,7 @@ void TaskIo_TransmitGenericCanMessage(tstCanMessage stCanMessage[])
 			else
 			{
 				gpio_set_level(GPIO_OUTPUT_GSM_DIAG, 1);
-				#if 1
+				#if DEBUG_IO
 				ESP_LOGI(IO_TASK_TAG,"CAN TX FAILED:0x%04X\r\n",stCanMessage[i].stCan.identifier);
 				#endif
 
@@ -1793,7 +1859,8 @@ static sStateMachineType const gasTaskIo_Initializing[] =
 {
     /* Event        Action routine      Next state */
     //  State specific transitions
-	{EVENT_IO_ADD_CAN_MESSAGE,	      	TaskIo_AddCanMessage,			TASKIO_INITIALIZING,  			TASKIO_INITIALIZING					},	
+	{EVENT_IO_ADD_CAN_MESSAGE,	      	TaskIo_AddCanMessage,			TASKIO_INITIALIZING,  			TASKIO_INITIALIZING					},
+	{EVENT_IO_TRANSMIT_EVENT_CAN_MESSAGE, TaskIo_TransmitEventCanMessage, TASKIO_INITIALIZING,  			TASKIO_INITIALIZING				},
 	{EVENT_IO_ERROR,	      			TaskIo_Error,				   	TASKIO_INITIALIZING,  			TASKIO_INITIALIZING					},
     {EVENT_IO_NULL,           			TaskIo_IgnoreEvent,          	TASKIO_INITIALIZING,			TASKIO_INITIALIZING					}
 };
@@ -1812,7 +1879,7 @@ void vTaskIo( void *pvParameters )
 	{
 		Elapsed_Time1 = xTaskGetTickCount();
 		TaskIo_ReadIo();
-		TaskIo_TransmitEventCanMessage(stCanMessage0ms);
+		/*TaskIo_TransmitEventCanMessage(stCanMessage0ms);*/
 
 		if(u32Timeout % 20 == 0)
 		{
@@ -1837,6 +1904,10 @@ void vTaskIo( void *pvParameters )
 		if(u32Timeout % 200 == 0)
 		{
 			TaskIo_TransmitGenericCanMessage(stCanMessage200ms);
+			if (ucCustomCANMsg != false){
+				TaskIo_TransmitCustomCanMessage(stCanMessage0ms,sizeof stCanMessage0ms / sizeof stCanMessage0ms[0]);
+			}
+
 		}		
 		if(u32Timeout % 500 == 0)
 		{

@@ -18,6 +18,7 @@
 #include "esp_eth.h"
 
 #include "freertos/queue.h"
+#include "freertos/timers.h"
 #include "defines.h"
 #include "Sd.h"
 #include "Io.h"
@@ -28,6 +29,7 @@ static const char *TAG = "HTTP_SERVER";
 sMessageType stHttpSrvMsg;
 extern char cConfigHttpRxBuffer[RX_BUF_SIZE];
 extern tstConfiguration stConfigData;
+extern tstCanMessage stCanMessage0ms[];
 extern tstCanMessage stCanMessage20ms[];
 extern tstCanMessage stCanMessage50ms[];
 extern tstCanMessage stCanMessage60ms[];
@@ -37,6 +39,18 @@ extern tstCanMessage stCanMessage200ms[];
 extern tstCanMessage stCanMessage500ms[];
 extern tstCanMessage stCanMessage1000ms[];
 
+#if 0
+void vTimer200msCallback( TimerHandle_t xTimer )
+{
+	/* Receive data over BT and pass it over to SD*/
+	stHttpSrvMsg.ucSrc = SRC_HTTPSRV;
+	stHttpSrvMsg.ucDest = SRC_IO;
+	stHttpSrvMsg.ucEvent = EVENT_IO_TRANSMIT_EVENT_CAN_MESSAGE;
+	stHttpSrvMsg.pcMessageData = (char*)&stCanMessage0ms[0];
+
+	xQueueSend( xQueueIo, ( void * )&stHttpSrvMsg, NULL);
+}
+#endif
 /* An HTTP GET handler */
 static esp_err_t Read_get_handler(httpd_req_t *req)
 {
@@ -611,7 +625,7 @@ static esp_err_t Read_get_handler(httpd_req_t *req)
 	strcat(cWebpage,cHtml);
 	strcat(cWebpage,"<button class=\"button button-off\">Send</button>");
 	strcat(cWebpage,"</form>");
-
+#if 0
 	/*********************************************************************************/
 	/* VIN_01*/
 	/*********************************************************************************/
@@ -630,7 +644,7 @@ static esp_err_t Read_get_handler(httpd_req_t *req)
 	strcat(cWebpage,cHtml);
 	strcat(cWebpage,"<button class=\"button button-off\">Send</button>");
 	strcat(cWebpage,"</form>");
-
+#endif
 	/*********************************************************************************/
 	/* WFS_01*/
 	/*********************************************************************************/
@@ -899,6 +913,33 @@ static esp_err_t Read_get_handler(httpd_req_t *req)
 	strcat(cWebpage,"<button class=\"button button-off\">Send</button>");
 	strcat(cWebpage,"</form>");
 
+	/*********************************************************************************/
+	/* vin_01*/
+	/*********************************************************************************/
+	strcat(cWebpage,"<form action=\"/response\"  method=\"get\">");
+	strcat(cWebpage,"<label for=\"vin_01\">VIN_01:</label>");
+	sprintf(cHtml,"<input type=\"text\" id=\"vin_01\" maxlength=\"17\" size=\"17\" name=\"vin_01\" value=\"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\">",\
+												stCanMessage0ms[0].stCan.data[5],\
+												stCanMessage0ms[0].stCan.data[6],\
+												stCanMessage0ms[0].stCan.data[7],\
+												stCanMessage0ms[1].stCan.data[1],\
+												stCanMessage0ms[1].stCan.data[2],\
+												stCanMessage0ms[1].stCan.data[3],\
+												stCanMessage0ms[1].stCan.data[4],\
+												stCanMessage0ms[1].stCan.data[5],\
+												stCanMessage0ms[1].stCan.data[6],\
+												stCanMessage0ms[1].stCan.data[7],\
+												stCanMessage0ms[2].stCan.data[1],\
+												stCanMessage0ms[2].stCan.data[2],\
+												stCanMessage0ms[2].stCan.data[3],\
+												stCanMessage0ms[2].stCan.data[4],\
+												stCanMessage0ms[2].stCan.data[5],\
+												stCanMessage0ms[2].stCan.data[6],\
+												stCanMessage0ms[2].stCan.data[7]);
+	strcat(cWebpage,cHtml);
+	strcat(cWebpage,"<button class=\"button button-off\">Send</button>");
+	strcat(cWebpage,"</form>");
+
 
     strcat(cWebpage,"</body>\n");
 	strcat(cWebpage,"</html>\n");
@@ -1074,7 +1115,122 @@ static esp_err_t Response_get_handler(httpd_req_t *req)
 			}
 			if (httpd_query_key_value(buf, "vin_01", param, sizeof(param)) == ESP_OK )
 			{
-				pst = &stCanMessage200ms[6];
+				pst = &stCanMessage0ms[0];
+				pst->u32Period = 200;
+				pst->u32Timeout = 0;
+				pst->stCan.flags = CAN_MSG_FLAG_NONE;
+				pst->stCan.data_length_code = 8;
+				pst->stCan.identifier = 0x06B4;
+				pst->stCan.data[0]=0x00;
+				pst->stCan.data[1]=0x00;
+				pst->stCan.data[2]=0x00;
+				pst->stCan.data[3]=0x00;
+				pst->stCan.data[4]=0x00;
+				pst->stCan.data[5]=buf[7];
+				pst->stCan.data[6]=buf[8];
+				pst->stCan.data[7]=buf[9];
+				ESP_LOGI(TAG, "stCanMessage0ms[0]:%02X%02X%02X%02X%02X%02X%02X%02X",pst->stCan.data[0],\
+																				 pst->stCan.data[1],\
+																				 pst->stCan.data[2],\
+																				 pst->stCan.data[3],\
+																				 pst->stCan.data[4],\
+																				 pst->stCan.data[5],\
+																				 pst->stCan.data[6],\
+																				 pst->stCan.data[7]);
+
+
+				pst = &stCanMessage0ms[1];
+				pst->u32Period = 200;
+				pst->u32Timeout = 0;
+				pst->stCan.flags = CAN_MSG_FLAG_NONE;
+				pst->stCan.data_length_code = 8;
+				pst->stCan.identifier = 0x06B4;
+				pst->stCan.data[0]=0x01;
+				pst->stCan.data[1]=buf[10];
+				pst->stCan.data[2]=buf[11];
+				pst->stCan.data[3]=buf[12];
+				pst->stCan.data[4]=buf[13];
+				pst->stCan.data[5]=buf[14];
+				pst->stCan.data[6]=buf[15];
+				pst->stCan.data[7]=buf[16];
+				ESP_LOGI(TAG, "stCanMessage0ms[1]:%02X%02X%02X%02X%02X%02X%02X%02X",pst->stCan.data[0],\
+																				 pst->stCan.data[1],\
+																				 pst->stCan.data[2],\
+																				 pst->stCan.data[3],\
+																				 pst->stCan.data[4],\
+																				 pst->stCan.data[5],\
+																				 pst->stCan.data[6],\
+																				 pst->stCan.data[7]);
+
+
+				pst = &stCanMessage0ms[2];
+				pst->u32Period = 200;
+				pst->u32Timeout = 0;
+				pst->stCan.flags = CAN_MSG_FLAG_NONE;
+				pst->stCan.data_length_code = 8;
+				pst->stCan.identifier = 0x06B4;
+				pst->stCan.data[0]=0x02;
+				pst->stCan.data[1]=buf[17];
+				pst->stCan.data[2]=buf[18];
+				pst->stCan.data[3]=buf[19];
+				pst->stCan.data[4]=buf[20];
+				pst->stCan.data[5]=buf[21];
+				pst->stCan.data[6]=buf[22];
+				pst->stCan.data[7]=buf[23];
+				ESP_LOGI(TAG, "stCanMessage0ms[2]:%02X%02X%02X%02X%02X%02X%02X%02X",pst->stCan.data[0],\
+																				 pst->stCan.data[1],\
+																				 pst->stCan.data[2],\
+																				 pst->stCan.data[3],\
+																				 pst->stCan.data[4],\
+																				 pst->stCan.data[5],\
+																				 pst->stCan.data[6],\
+																				 pst->stCan.data[7]);
+
+
+				/* Receive data over BT and pass it over to SD*/
+				stHttpSrvMsg.ucSrc = SRC_HTTPSRV;
+				stHttpSrvMsg.ucDest = SRC_IO;
+				stHttpSrvMsg.ucEvent = EVENT_IO_TRANSMIT_EVENT_CAN_MESSAGE;
+				stHttpSrvMsg.pcMessageData = (char*)&stCanMessage0ms[0];
+
+				xQueueSend( xQueueIo, ( void * )&stHttpSrvMsg, NULL);
+
+#if 0
+				 TimerHandle_t Timer200ms = xTimerCreate
+										   ( /* Just a text name, not used by the RTOS
+											 kernel. */
+											 "Timer200ms",
+											 /* The timer period in ticks, must be
+											 greater than 0. */
+											 200,
+											 /* The timers will auto-reload themselves
+											 when they expire. */
+											 pdTRUE,
+											 /* The ID is used to store a count of the
+											 number of times the timer has expired, which
+											 is initialised to 0. */
+											 ( void * ) 0,
+											 /* Each timer calls the same callback when
+											 it expires. */
+											 vTimer200msCallback
+										   );
+
+					if( Timer200ms == NULL )
+					{
+					/* The timer was not created. */
+					}
+					else
+					{
+						/* Start the timer.  No block time is specified, and
+						even if one was it would be ignored because the RTOS
+						scheduler has not yet been started. */
+						if( xTimerStart( Timer200ms, 0 ) != pdPASS )
+						{
+						  /* The timer could not be set into the Active
+						  state. */
+						}
+					}
+#endif
 			}
 			if (httpd_query_key_value(buf, "wfs_01", param, sizeof(param)) == ESP_OK )
 			{
@@ -1135,7 +1291,7 @@ static esp_err_t Response_get_handler(httpd_req_t *req)
 				pst = &stCanMessage1000ms[10];
 			}
 
-            if(pst!=NULL)
+            if((pst!=NULL) && ((pst->stCan.identifier !=0x06B4)))
 			{
 				ESP_LOGI(TAG, "Found URL query parameter => DATA=%s", param);
 

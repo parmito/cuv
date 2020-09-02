@@ -8,7 +8,7 @@
  extern "C" {
 #endif
 
-#define SOFTWARE_VERSION 		(char*)"2.0.1"
+#define SOFTWARE_VERSION 		(char*)"3.0.0"
 
 #define MODEM_ATTEMPT			3
 
@@ -26,7 +26,7 @@
 
 #define DEBUG_GPS 				1
 #define DEBUG_SDCARD 			1
-#define DEBUG_IO				1
+#define DEBUG_IO				0
 #define DEBUG_WIFI				0
 #define DEBUG_GSM				1
 
@@ -125,6 +125,8 @@
 #define	EVENT_IO_ADD_CAN_MESSAGE	(unsigned char)11
 #define	EVENT_IO_ERROR				(unsigned char)12
 #define EVENT_IO_NULL				(unsigned char)13
+#define EVENT_IO_TRANSMIT_EVENT_CAN_MESSAGE (unsigned char)14
+
 
 #define TASKIO_IDLING 				(unsigned char)0
 #define TASKIO_INITIALIZING 		(unsigned char)1
