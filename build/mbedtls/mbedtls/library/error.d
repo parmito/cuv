@@ -15,6 +15,8 @@ mbedtls/library/error.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/port/include/esp32/aes.h \
  /home/danilo/esp/esp-idf/components/esp_common/include/esp_types.h \
  /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/aes.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/base64.h \
  /home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/bignum.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h \
@@ -25,7 +27,6 @@ mbedtls/library/error.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aes.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/dhm.h \
- /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/entropy.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha512.h \
@@ -88,6 +89,10 @@ mbedtls/library/error.o: \
 
 /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/aes.h:
 
+/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1.h:
+
+/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h:
+
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/base64.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/bignum.h:
@@ -107,8 +112,6 @@ mbedtls/library/error.o: \
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aes.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/dhm.h:
-
-/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h:
 

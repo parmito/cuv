@@ -1,6 +1,7 @@
 port/mbedtls_debug.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/port/mbedtls_debug.c \
  /home/danilo/esp/esp-idf/components/log/include/esp_log.h \
+ /home/danilo/esp/esp-idf/components/esp_rom/include/esp_rom_sys.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h \
  /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/ets_sys.h \
  /home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h \
@@ -33,6 +34,8 @@ port/mbedtls_debug.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_debug.h
 
 /home/danilo/esp/esp-idf/components/log/include/esp_log.h:
+
+/home/danilo/esp/esp-idf/components/esp_rom/include/esp_rom_sys.h:
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h:
 

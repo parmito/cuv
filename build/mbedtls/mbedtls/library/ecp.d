@@ -13,7 +13,9 @@ mbedtls/library/ecp.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_time.h \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/time.h \
- /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp_internal.h
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp_internal.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hmac_drbg.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md.h
 
 /home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_config.h:
 
@@ -42,4 +44,8 @@ mbedtls/library/ecp.o: \
 /home/danilo/esp/esp-idf/components/newlib/platform_include/time.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp_internal.h:
+
+/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hmac_drbg.h:
+
+/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md.h:
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/library/ecp.c:

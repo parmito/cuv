@@ -2,7 +2,8 @@ src/gdbstub.o: \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/src/gdbstub.c \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/include/esp_gdbstub.h \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/esp_gdbstub_arch.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/tie.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/corebits.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/system.h \
@@ -19,7 +20,9 @@ src/gdbstub.o: \
 
 /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/esp_gdbstub_arch.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h:
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/tie.h:
 

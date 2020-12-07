@@ -21,6 +21,8 @@ mbedtls/library/pkwrite.o: \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_util.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/rsa.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/bignum.h \
+ /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
  /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pem.h \
@@ -69,6 +71,10 @@ mbedtls/library/pkwrite.o: \
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_util.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/rsa.h:
+
+/home/danilo/esp/esp-idf/components/mbedtls/port/include/mbedtls/bignum.h:
+
+/home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h:
 
 /home/danilo/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h:
 

@@ -2,7 +2,8 @@ xtensa/gdbstub_xtensa.o: \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/gdbstub_xtensa.c \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/include/esp_gdbstub.h \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/esp_gdbstub_arch.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/tie.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/corebits.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/system.h \
@@ -14,19 +15,30 @@ xtensa/gdbstub_xtensa.o: \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/esp32/gdbstub_target_config.h \
  /home/danilo/esp/esp-idf/components/esp_gdbstub/private_include/esp_gdbstub_common.h \
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h \
- /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/cpu.h \
+ /home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/cpu.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xt_instr_macros.h \
+ /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/specreg.h \
+ /home/danilo/esp/esp-idf/components/hal/include/hal/cpu_hal.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h \
+ /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_compiler.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc_caps.h \
+ /home/danilo/esp/esp-idf/components/hal/include/hal/cpu_types.h \
+ /home/danilo/esp/esp-idf/components/hal/esp32/include/hal/cpu_ll.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/esp_attr.h \
+ /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/extreg.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h \
  /home/danilo/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h \
- /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h \
- /home/danilo/esp/esp-idf/components/esp32/include/esp_attr.h
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h
 
 /home/danilo/esp/esp-idf/components/esp_gdbstub/include/esp_gdbstub.h:
 
 /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/esp_gdbstub_arch.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h:
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/tie.h:
 
@@ -50,17 +62,35 @@ xtensa/gdbstub_xtensa.o: \
 
 /home/danilo/esp/esp-idf/examples/get-started/cuv/build/include/sdkconfig.h:
 
-/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/cpu.h:
+/home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/cpu.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xt_instr_macros.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/specreg.h:
+
+/home/danilo/esp/esp-idf/components/hal/include/hal/cpu_hal.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h:
+
+/home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_compiler.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc_caps.h:
+
+/home/danilo/esp/esp-idf/components/hal/include/hal/cpu_types.h:
+
+/home/danilo/esp/esp-idf/components/hal/esp32/include/hal/cpu_ll.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/esp_attr.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/extreg.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h:
 
 /home/danilo/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
 
 /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h:
-
-/home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h:
-
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h:
-
-/home/danilo/esp/esp-idf/components/esp32/include/esp_attr.h:
 /home/danilo/esp/esp-idf/components/esp_gdbstub/xtensa/gdbstub_xtensa.c:

@@ -3,6 +3,8 @@
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/asio/libasio.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/bootloader_support/libbootloader_support.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/bt/libbt.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/cbor/libcbor.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/cmock/libcmock.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/coap/libcoap.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/console/libconsole.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/cxx/libcxx.a
@@ -15,12 +17,20 @@
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_eth/libesp_eth.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_event/libesp_event.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_gdbstub/libesp_gdbstub.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_hid/libesp_hid.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_http_client/libesp_http_client.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_http_server/libesp_http_server.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_https_ota/libesp_https_ota.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_hw_support/libesp_hw_support.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_ipc/libesp_ipc.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_local_ctrl/libesp_local_ctrl.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_netif/libesp_netif.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_pm/libesp_pm.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_ringbuf/libesp_ringbuf.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_rom/libesp_rom.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_serial_slave_link/libesp_serial_slave_link.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_system/libesp_system.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_timer/libesp_timer.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_websocket_client/libesp_websocket_client.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/esp_wifi/libesp_wifi.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/espcoredump/libespcoredump.a
@@ -28,6 +38,7 @@
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/fatfs/libfatfs.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/freemodbus/libfreemodbus.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/freertos/libfreertos.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/hal/libhal.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/heap/libheap.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/idf_test/libidf_test.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/jsmn/libjsmn.a
@@ -43,6 +54,7 @@
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/nghttp/libnghttp.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/nvs_flash/libnvs_flash.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/openssl/libopenssl.a
+ /home/danilo/esp/esp-idf/examples/get-started/cuv/build/perfmon/libperfmon.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/protobuf-c/libprotobuf-c.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/protocomm/libprotocomm.a
  /home/danilo/esp/esp-idf/examples/get-started/cuv/build/pthread/libpthread.a

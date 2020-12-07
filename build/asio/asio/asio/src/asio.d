@@ -10,54 +10,73 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/sockets.h \
  /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/opt.h \
  /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/lwipopts.h \
- /home/danilo/esp/esp-idf/components/vfs/include/sys/ioctl.h \
+ /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/ioctl.h \
  /home/danilo/esp/esp-idf/components/esp_common/include/esp_task.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
+ /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_compiler.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/FreeRTOSConfig.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_config.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/hal.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/core.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa-versions.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/core-matmap.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/tie.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/system.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/corebits.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtruntime-frames.h \
+ /home/danilo/esp/esp-idf/components/esp_rom/include/esp_rom_sys.h \
  /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/ets_sys.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_system.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h \
- /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h \
- /home/danilo/esp/esp-idf/components/esp32/include/esp_attr.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_idf_version.h \
- /home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/sntp.h \
- /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netif/dhcp_state.h \
- /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/debug.h \
- /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/arch.h \
- /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/cc.h \
- /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/sys_arch.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/portable.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
- /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/cpu.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/portmacro.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portmacro.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtruntime.h \
  /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/specreg.h \
  /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtruntime-core-state.h \
  /home/danilo/esp/esp-idf/components/esp_common/include/esp_private/crosscore_int.h \
- /home/danilo/esp/esp-idf/components/esp_common/include/esp_timer.h \
+ /home/danilo/esp/esp-idf/components/esp_timer/include/esp_timer.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h \
+ /home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h \
+ /home/danilo/esp/esp-idf/components/esp_system/include/esp_system.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/esp_attr.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_idf_version.h \
+ /home/danilo/esp/esp-idf/components/newlib/platform_include/esp_newlib.h \
+ /home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/spinlock.h \
+ /home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/cpu.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xt_instr_macros.h \
+ /home/danilo/esp/esp-idf/components/hal/include/hal/cpu_hal.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc_caps.h \
+ /home/danilo/esp/esp-idf/components/hal/include/hal/cpu_types.h \
+ /home/danilo/esp/esp-idf/components/hal/esp32/include/hal/cpu_ll.h \
+ /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/extreg.h \
+ /home/danilo/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
+ /home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ /home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h \
+ /home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/compare_set.h \
  /home/danilo/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  /home/danilo/esp/esp-idf/components/heap/include/multi_heap.h \
- /home/danilo/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_api.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_api.h \
+ /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portbenchmark.h \
+ /home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portmacro_priv.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
+ /home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/sntp.h \
+ /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netif/dhcp_state.h \
+ /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/arch.h \
+ /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/cc.h \
+ /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/sys_arch.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/task.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/list.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ /home/danilo/esp/esp-idf/components/freertos/include/freertos/task.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h \
  /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/vfs_lwip.h \
+ /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/debug.h \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/poll.h \
  /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/ip_addr.h \
  /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/def.h \
@@ -85,12 +104,12 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/local_free_on_block_exit.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/socket_types.hpp \
  /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/sys/socket.h \
+ /home/danilo/esp/esp-idf/components/newlib/platform_include/net/if.h \
+ /home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/if_api.h \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/uio.h \
  /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/un.h \
  /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netinet/in.h \
  /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arpa/inet.h \
- /home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/../../../lwip/src/include/lwip/inet.h \
- /home/danilo/esp/esp-idf/components/newlib/platform_include/net/if.h \
  /home/danilo/esp/esp-idf/components/asio/port/include/esp_exception.h \
  /home/danilo/esp/esp-idf/components/log/include/esp_log.h \
  /home/danilo/esp/esp-idf/components/log/include/esp_log_internal.h \
@@ -102,7 +121,6 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_type_requirements.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/async_result.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/type_traits.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_type.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scoped_ptr.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/service_registry.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/mutex.hpp \
@@ -116,9 +134,7 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/throw_exception.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/executor.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/atomic_count.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_op.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/fenced_block.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/std_fenced_block.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_function.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_alloc_helpers.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/recycling_allocator.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_context.hpp \
@@ -128,15 +144,18 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_info_base.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/associated_allocator.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_alloc_hook.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/global.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_global.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_executor.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_executor.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_op.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/fenced_block.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/std_fenced_block.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_invoke_helpers.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_invoke_hook.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scheduler_operation.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_tracking.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/op_queue.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/global.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_global.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_executor.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_executor.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_context.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scheduler.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/conditionally_enabled_event.hpp \
@@ -146,9 +165,9 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/assert.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/null_event.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/reactor_fwd.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_group.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_thread.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_group.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_context.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/handler_alloc_hook.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/io_context.ipp \
@@ -165,6 +184,7 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/completion_handler.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_work.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/operation.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/non_const_lvalue.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/throw_error.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/concurrency_hint.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/limits.hpp \
@@ -192,8 +212,8 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/reactive_descriptor_service.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/buffer.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/array_fwd.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/is_buffer_sequence.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/string_view.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/is_buffer_sequence.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/buffer_sequence_adapter.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/descriptor_read_op.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/reactor_op.hpp \
@@ -227,13 +247,12 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/socket_holder.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/resolver_service_base.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/resolver_service_base.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/executor_work_guard.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/resolve_op.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/scheduler.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scheduler_thread_info.hpp \
- /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/select_reactor.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/signal_blocker.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_signal_blocker.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/select_reactor.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/service_registry.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/signal_set_service.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/signal_set_service.hpp \
@@ -246,6 +265,7 @@ asio/asio/src/asio.o: \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_executor_service.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/strand_executor_service.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_executor_service.hpp \
+ /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/executor_work_guard.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_service.ipp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/strand_service.hpp \
  /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_service.hpp \
@@ -317,13 +337,17 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/lwipopts.h:
 
-/home/danilo/esp/esp-idf/components/vfs/include/sys/ioctl.h:
+/home/danilo/esp/esp-idf/components/newlib/platform_include/sys/ioctl.h:
 
 /home/danilo/esp/esp-idf/components/esp_common/include/esp_task.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
+/home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h:
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_compiler.h:
+
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/FreeRTOSConfig.h:
+
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_config.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/hal.h:
 
@@ -337,41 +361,17 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/system.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h:
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_context.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/corebits.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtruntime-frames.h:
 
+/home/danilo/esp/esp-idf/components/esp_rom/include/esp_rom_sys.h:
+
 /home/danilo/esp/esp-idf/components/esp_rom/include/esp32/rom/ets_sys.h:
-
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_system.h:
-
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h:
-
-/home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h:
-
-/home/danilo/esp/esp-idf/components/esp32/include/esp_attr.h:
-
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h:
-
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_idf_version.h:
-
-/home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/sntp.h:
-
-/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netif/dhcp_state.h:
-
-/home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/debug.h:
-
-/home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/arch.h:
-
-/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/cc.h:
-
-/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/sys_arch.h:
-
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
-
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 
@@ -379,9 +379,7 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h:
 
-/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/cpu.h:
-
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/portmacro.h:
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portmacro.h:
 
 /home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtruntime.h:
 
@@ -391,15 +389,71 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/esp_common/include/esp_private/crosscore_int.h:
 
-/home/danilo/esp/esp-idf/components/esp_common/include/esp_timer.h:
+/home/danilo/esp/esp-idf/components/esp_timer/include/esp_timer.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_err.h:
+
+/home/danilo/esp/esp-idf/components/newlib/platform_include/assert.h:
+
+/home/danilo/esp/esp-idf/components/esp_system/include/esp_system.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/esp_attr.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_bit_defs.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_idf_version.h:
+
+/home/danilo/esp/esp-idf/components/newlib/platform_include/esp_newlib.h:
+
+/home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/spinlock.h:
+
+/home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/cpu.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xt_instr_macros.h:
+
+/home/danilo/esp/esp-idf/components/hal/include/hal/cpu_hal.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc_caps.h:
+
+/home/danilo/esp/esp-idf/components/hal/include/hal/cpu_types.h:
+
+/home/danilo/esp/esp-idf/components/hal/esp32/include/hal/cpu_ll.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/esp32/include/xtensa/config/extreg.h:
+
+/home/danilo/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
+
+/home/danilo/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+/home/danilo/esp/esp-idf/components/esp_common/include/esp_assert.h:
+
+/home/danilo/esp/esp-idf/components/esp_hw_support/include/soc/compare_set.h:
 
 /home/danilo/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 
 /home/danilo/esp/esp-idf/components/heap/include/multi_heap.h:
 
-/home/danilo/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/xtensa_api.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_api.h:
+
+/home/danilo/esp/esp-idf/components/xtensa/include/xtensa/xtensa_context.h:
+
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portbenchmark.h:
+
+/home/danilo/esp/esp-idf/components/freertos/port/xtensa/include/freertos/portmacro_priv.h:
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
+
+/home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/sntp.h:
+
+/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netif/dhcp_state.h:
+
+/home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/arch.h:
+
+/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/cc.h:
+
+/home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/sys_arch.h:
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/task.h:
 
@@ -407,11 +461,15 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
+/home/danilo/esp/esp-idf/components/freertos/include/freertos/task.h:
+
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 /home/danilo/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arch/vfs_lwip.h:
+
+/home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/debug.h:
 
 /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/poll.h:
 
@@ -467,6 +525,10 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/sys/socket.h:
 
+/home/danilo/esp/esp-idf/components/newlib/platform_include/net/if.h:
+
+/home/danilo/esp/esp-idf/components/lwip/lwip/src/include/lwip/if_api.h:
+
 /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/uio.h:
 
 /home/danilo/esp/esp-idf/components/newlib/platform_include/sys/un.h:
@@ -474,10 +536,6 @@ asio/asio/src/asio.o: \
 /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/netinet/in.h:
 
 /home/danilo/esp/esp-idf/components/lwip/port/esp32/include/arpa/inet.h:
-
-/home/danilo/esp/esp-idf/components/lwip/include/apps/sntp/../../../lwip/src/include/lwip/inet.h:
-
-/home/danilo/esp/esp-idf/components/newlib/platform_include/net/if.h:
 
 /home/danilo/esp/esp-idf/components/asio/port/include/esp_exception.h:
 
@@ -500,8 +558,6 @@ asio/asio/src/asio.o: \
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/async_result.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/type_traits.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_type.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scoped_ptr.hpp:
 
@@ -529,11 +585,7 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/atomic_count.hpp:
 
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_op.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/fenced_block.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/std_fenced_block.hpp:
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_function.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_alloc_helpers.hpp:
 
@@ -553,6 +605,20 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_alloc_hook.hpp:
 
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/global.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_global.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_executor.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_executor.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/executor_op.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/fenced_block.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/std_fenced_block.hpp:
+
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_invoke_helpers.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/handler_invoke_hook.hpp:
@@ -562,14 +628,6 @@ asio/asio/src/asio.o: \
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_tracking.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/op_queue.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/global.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_global.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_executor.hpp:
-
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_executor.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/system_context.hpp:
 
@@ -589,11 +647,11 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/reactor_fwd.hpp:
 
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_group.hpp:
-
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_thread.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/thread_group.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/impl/system_context.hpp:
 
@@ -626,6 +684,8 @@ asio/asio/src/asio.o: \
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/handler_work.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/operation.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/non_const_lvalue.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/throw_error.hpp:
 
@@ -681,9 +741,9 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/array_fwd.hpp:
 
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/is_buffer_sequence.hpp:
-
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/string_view.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/is_buffer_sequence.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/buffer_sequence_adapter.hpp:
 
@@ -751,19 +811,17 @@ asio/asio/src/asio.o: \
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/resolver_service_base.hpp:
 
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/executor_work_guard.hpp:
-
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/resolve_op.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/scheduler.ipp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/scheduler_thread_info.hpp:
 
-/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/select_reactor.ipp:
-
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/signal_blocker.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/posix_signal_blocker.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/select_reactor.ipp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/service_registry.ipp:
 
@@ -788,6 +846,8 @@ asio/asio/src/asio.o: \
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/strand_executor_service.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_executor_service.hpp:
+
+/home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/executor_work_guard.hpp:
 
 /home/danilo/esp/esp-idf/components/asio/asio/asio/include/asio/detail/impl/strand_service.ipp:
 
